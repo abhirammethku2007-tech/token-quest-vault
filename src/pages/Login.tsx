@@ -127,9 +127,7 @@ export default function Login() {
                       className="glass"
                     />
                     <p className="text-[11px] text-muted-foreground">
-                      {r === "student"
-                        ? "Use your roll number followed by @mrit.ac.in"
-                        : "Use your name followed by @mlrit.ac.in"}
+                      Use your {r === "student" ? "roll number" : "name"} followed by @mlrit.ac.in
                     </p>
                   </div>
                   <div className="space-y-2">
