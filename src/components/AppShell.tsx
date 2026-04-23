@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth, Role } from "@/context/AuthContext";
@@ -24,36 +24,46 @@ const navByRole: Record<Role, NavItem[]> = {
     { to: "/student/certificates", label: "My Certificates", icon: FileText },
     { to: "/student/profile", label: "Profile", icon: User },
   ],
-  admin: [
-    { to: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { to: "/admin/requests", label: "Requests", icon: Inbox },
-    { to: "/admin/generate", label: "Generate Certificate", icon: FileSignature },
-    { to: "/admin/users", label: "User Management", icon: Users },
-  ],
   management: [
-    { to: "/management", label: "Overview", icon: LayoutDashboard },
-    { to: "/management/analytics", label: "Analytics", icon: BarChart3 },
-    { to: "/management/audit", label: "Audit Logs", icon: ScrollText },
-    { to: "/management/signatures", label: "Signature Keys", icon: KeyRound },
+    { to: "/management", label: "Dashboard", icon: LayoutDashboard },
+    { to: "/management/requests", label: "Requests", icon: Inbox },
+    { to: "/management/generate", label: "Generate Certificate", icon: FileSignature },
+    { to: "/management/users", label: "User Management", icon: Users },
+  ],
+  admin: [
+    { to: "/admin", label: "Overview", icon: LayoutDashboard },
+    { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
+    { to: "/admin/audit", label: "Audit Logs", icon: ScrollText },
+    { to: "/admin/signatures", label: "Signature Keys", icon: KeyRound },
   ],
 };
 
 const roleLabel: Record<Role, string> = {
   student: "Student Portal",
-  admin: "Admin Console",
-  management: "Management Suite",
+  management: "Management Console",
+  admin: "Admin Suite",
 };
 
 export function AppShell({ children, role }: { children: ReactNode; role: Role }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
   const items = navByRole[role];
 
+  useEffect(() => {
+    const saved = localStorage.getItem("ccp_theme");
+    if (saved === "dark") {
+      document.documentElement.classList.add("dark");
+      setDark(true);
+    }
+  }, []);
+
   const toggleDark = () => {
-    document.documentElement.classList.toggle("dark");
-    setDark((d) => !d);
+    const next = !dark;
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("ccp_theme", next ? "dark" : "light");
+    setDark(next);
   };
 
   const handleLogout = () => { logout(); navigate("/login"); };
@@ -63,12 +73,12 @@ export function AppShell({ children, role }: { children: ReactNode; role: Role }
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 glass-strong border-r border-white/40 transition-transform duration-300",
+          "fixed inset-y-0 left-0 z-40 w-64 glass-strong border-r border-white/40 dark:border-white/10 transition-transform duration-300",
           "lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-16 items-center justify-between px-5 border-b border-white/40">
+        <div className="flex h-16 items-center justify-between px-5 border-b border-white/40 dark:border-white/10">
           <Link to={`/${role}`} className="flex items-center gap-2">
             <div className="rounded-lg p-1.5 bg-gradient-to-br from-primary to-primary-glow btn-glow">
               <ShieldCheck className="h-5 w-5 text-primary-foreground" />
@@ -108,7 +118,7 @@ export function AppShell({ children, role }: { children: ReactNode; role: Role }
       {/* Main */}
       <div className="lg:pl-64">
         {/* Topbar */}
-        <header className="sticky top-0 z-30 glass border-b border-white/40">
+        <header className="sticky top-0 z-30 glass border-b border-white/40 dark:border-white/10">
           <div className="flex h-16 items-center justify-between px-4 sm:px-6">
             <div className="flex items-center gap-2">
               <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(true)}>

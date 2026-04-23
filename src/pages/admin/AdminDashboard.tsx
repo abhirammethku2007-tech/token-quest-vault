@@ -17,7 +17,7 @@ export default function AdminDashboard() {
   const queue = store.pendingQueue().slice(0, 5);
 
   return (
-    <AppShell role="admin">
+    <AppShell role="management">
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
           <h1 className="font-display text-3xl font-bold">Admin Dashboard</h1>

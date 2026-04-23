@@ -21,7 +21,7 @@ export default function AdminUsers() {
   const [q, setQ] = useState("");
   const filtered = users.filter((u) => `${u.name} ${u.id} ${u.dept}`.toLowerCase().includes(q.toLowerCase()));
   return (
-    <AppShell role="admin">
+    <AppShell role="management">
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
