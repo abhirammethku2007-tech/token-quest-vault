@@ -111,6 +111,7 @@ export default function RequestCertificate() {
                     <SelectItem value="Bonafide">Bonafide</SelectItem>
                     <SelectItem value="Study Certificate">Study Certificate</SelectItem>
                     <SelectItem value="Fee Receipt">Fee Receipt</SelectItem>
+                    <SelectItem value="Fee Due Certificate">Fee Due Certificate</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
