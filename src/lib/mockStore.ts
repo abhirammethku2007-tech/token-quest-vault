@@ -60,6 +60,18 @@ const seedRequests: CertRequest[] = [
     status: "Rejected", createdAt: dayAgo(3), updatedAt: dayAgo(2),
     remarks: "Incomplete details — please re-submit",
   },
+  {
+    id: "r7", token: "NFD-2026-CSE-0021", studentId: "S101", studentName: "Aarav Sharma",
+    rollNumber: "21CSE011", department: "CSE", type: "No Fee Due Certificate",
+    status: "Approved", createdAt: dayAgo(1), updatedAt: dayAgo(0),
+    signatureId: "SIG-4e7f1a",
+  },
+  {
+    id: "r8", token: "FDC-2026-ECE-0022", studentId: "S102", studentName: "Priya Verma",
+    rollNumber: "21ECE007", department: "ECE", type: "Fee Due Certificate",
+    status: "Approved", createdAt: dayAgo(2), updatedAt: dayAgo(1),
+    signatureId: "SIG-b3c8d5",
+  },
 ];
 
 function dayAgo(d: number) {
