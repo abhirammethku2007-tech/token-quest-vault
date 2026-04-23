@@ -83,6 +83,7 @@ export default function CertificateGeneration() {
                     {sel.type === "Study Certificate" && "has been a student of this institution and has successfully completed the prescribed course of study for the academic year 2025-2026."}
                     {sel.type === "Fee Receipt" && "has paid all prescribed fees for the academic year 2025-2026. This receipt is issued for official records."}
                     {sel.type === "Fee Due Certificate" && "has the following fee dues pending with this institution for the academic year 2025-2026. This certificate is issued upon the student's request for official purposes."}
+                    {sel.type === "No Fee Due Certificate" && "has fully paid all prescribed tuition fees, examination fees, and other charges to this institution for the academic year 2025-2026. No fee dues are pending. This certificate is issued upon the student's request."}
                   </p>
 
                   <div className="flex items-end justify-between mt-10">

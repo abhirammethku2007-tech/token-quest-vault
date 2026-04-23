@@ -1,5 +1,5 @@
 // Mock data store for the demo. In a real build this would be replaced by Lovable Cloud.
-export type CertificateType = "Bonafide" | "Study Certificate" | "Fee Receipt" | "Fee Due Certificate";
+export type CertificateType = "Bonafide" | "Study Certificate" | "Fee Receipt" | "Fee Due Certificate" | "No Fee Due Certificate";
 export type RequestStatus = "Pending" | "Under Review" | "Approved" | "Rejected";
 
 export interface CertRequest {
@@ -23,6 +23,7 @@ const TYPE_PREFIX: Record<CertificateType, string> = {
   "Study Certificate": "STU",
   "Fee Receipt": "FEE",
   "Fee Due Certificate": "FDC",
+  "No Fee Due Certificate": "NFD",
 };
 
 const seedRequests: CertRequest[] = [
