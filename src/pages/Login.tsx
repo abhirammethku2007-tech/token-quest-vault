@@ -10,7 +10,7 @@ import { useAuth, Role } from "@/context/AuthContext";
 import { toast } from "sonner";
 
 const tabMeta: Record<Role, { label: string; icon: any; idLabel: string; placeholder: string; emailDomain: string }> = {
-  student: { label: "Student", icon: GraduationCap, idLabel: "College Email", placeholder: "21CSE011@mrit.ac.in", emailDomain: "@mrit.ac.in" },
+  student: { label: "Student", icon: GraduationCap, idLabel: "College Email", placeholder: "21CSE011@mlrit.ac.in", emailDomain: "@mlrit.ac.in" },
   admin: { label: "Admin", icon: Building2, idLabel: "College Email", placeholder: "principal@mlrit.ac.in", emailDomain: "@mlrit.ac.in" },
   management: { label: "Management", icon: ShieldCheck, idLabel: "College Email", placeholder: "neha@mlrit.ac.in", emailDomain: "@mlrit.ac.in" },
 };
@@ -127,9 +127,7 @@ export default function Login() {
                       className="glass"
                     />
                     <p className="text-[11px] text-muted-foreground">
-                      {r === "student"
-                        ? "Use your roll number followed by @mrit.ac.in"
-                        : "Use your name followed by @mlrit.ac.in"}
+                      Use your {r === "student" ? "roll number" : "name"} followed by @mlrit.ac.in
                     </p>
                   </div>
                   <div className="space-y-2">
