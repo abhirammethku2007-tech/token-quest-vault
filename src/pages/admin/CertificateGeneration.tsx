@@ -78,7 +78,11 @@ export default function CertificateGeneration() {
                   <p className="text-center font-display text-2xl font-semibold mt-2">{sel.studentName}</p>
                   <p className="text-center text-sm mt-3 max-w-md mx-auto text-muted-foreground">
                     bearing roll number <strong className="text-foreground">{sel.rollNumber}</strong> from the department of{" "}
-                    <strong className="text-foreground">{sel.department}</strong> is a bonafide student of this institution for the academic year 2025-2026.
+                    <strong className="text-foreground">{sel.department}</strong>{" "}
+                    {sel.type === "Bonafide" && "is a bonafide student of this institution for the academic year 2025-2026."}
+                    {sel.type === "Study Certificate" && "has been a student of this institution and has successfully completed the prescribed course of study for the academic year 2025-2026."}
+                    {sel.type === "Fee Receipt" && "has paid all prescribed fees for the academic year 2025-2026. This receipt is issued for official records."}
+                    {sel.type === "Fee Due Certificate" && "has the following fee dues pending with this institution for the academic year 2025-2026. This certificate is issued upon the student's request for official purposes."}
                   </p>
 
                   <div className="flex items-end justify-between mt-10">
