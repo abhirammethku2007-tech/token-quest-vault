@@ -19,7 +19,7 @@ const colors = ["hsl(234 89% 60%)", "hsl(258 90% 66%)", "hsl(210 95% 60%)"];
 
 export default function ManagementAnalytics() {
   return (
-    <AppShell role="management">
+    <AppShell role="admin">
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
           <h1 className="font-display text-3xl font-bold">Analytics</h1>

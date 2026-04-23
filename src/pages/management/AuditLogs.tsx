@@ -23,7 +23,7 @@ const tone: Record<string, string> = {
 
 export default function AuditLogs() {
   return (
-    <AppShell role="management">
+    <AppShell role="admin">
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
           <h1 className="font-display text-3xl font-bold">Audit Logs</h1>

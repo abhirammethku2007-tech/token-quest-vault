@@ -15,7 +15,7 @@ export default function CertificateGeneration() {
   const sel = approved.find((r) => r.id === selectedId);
 
   return (
-    <AppShell role="admin">
+    <AppShell role="management">
       <div className="max-w-6xl mx-auto space-y-6">
         <div>
           <h1 className="font-display text-3xl font-bold">Certificate Generation</h1>

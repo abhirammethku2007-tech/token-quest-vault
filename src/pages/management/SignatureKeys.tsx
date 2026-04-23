@@ -13,7 +13,7 @@ const keys = [
 
 export default function SignatureKeys() {
   return (
-    <AppShell role="management">
+    <AppShell role="admin">
       <div className="max-w-5xl mx-auto space-y-6">
         <div className="flex items-start justify-between gap-4">
           <div>

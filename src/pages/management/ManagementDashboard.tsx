@@ -28,7 +28,7 @@ export default function ManagementDashboard() {
   const deptColors = ["hsl(234 89% 60%)", "hsl(258 90% 66%)", "hsl(210 95% 60%)", "hsl(280 80% 65%)", "hsl(190 85% 55%)"];
 
   return (
-    <AppShell role="management">
+    <AppShell role="admin">
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
           <h1 className="font-display text-3xl font-bold">Management Overview</h1>
