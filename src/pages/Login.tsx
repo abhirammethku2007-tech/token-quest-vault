@@ -9,16 +9,10 @@ import { Eye, EyeOff, GraduationCap, ShieldCheck, Building2, Loader2, Sparkles }
 import { useAuth, Role } from "@/context/AuthContext";
 import { toast } from "sonner";
 
-const demoUsers: Record<Role, { id: string; name: string; email: string; department?: string; rollNumber?: string; designation?: string }> = {
-  student: { id: "S101", name: "Aarav Sharma", email: "aarav@college.edu", department: "CSE", rollNumber: "21CSE011" },
-  admin: { id: "A001", name: "Neha Pillai", email: "neha.admin@college.edu", designation: "Registrar" },
-  management: { id: "M001", name: "Dr. Vikram Rao", email: "principal@college.edu", designation: "Principal" },
-};
-
-const tabMeta: Record<Role, { label: string; icon: any; idLabel: string; placeholder: string }> = {
-  student: { label: "Student", icon: GraduationCap, idLabel: "Student ID", placeholder: "S101" },
-  admin: { label: "Admin", icon: ShieldCheck, idLabel: "Admin ID", placeholder: "A001" },
-  management: { label: "Management", icon: Building2, idLabel: "Management ID", placeholder: "M001" },
+const tabMeta: Record<Role, { label: string; icon: any; idLabel: string; placeholder: string; emailDomain: string }> = {
+  student: { label: "Student", icon: GraduationCap, idLabel: "College Email", placeholder: "21CSE011@mrit.ac.in", emailDomain: "@mrit.ac.in" },
+  admin: { label: "Admin", icon: Building2, idLabel: "College Email", placeholder: "principal@mlrit.ac.in", emailDomain: "@mlrit.ac.in" },
+  management: { label: "Management", icon: ShieldCheck, idLabel: "College Email", placeholder: "neha@mlrit.ac.in", emailDomain: "@mlrit.ac.in" },
 };
 
 export default function Login() {
@@ -26,36 +20,48 @@ export default function Login() {
   const { login } = useAuth();
   const [role, setRole] = useState<Role>("student");
   const [showPw, setShowPw] = useState(false);
-  const [id, setId] = useState("");
+  const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email) {
+      toast.error("Please enter your college email");
+      return;
+    }
+    const meta = tabMeta[role];
+    if (!email.endsWith(meta.emailDomain)) {
+      toast.error(`${role === "student" ? "Student" : "Staff"} email must end with ${meta.emailDomain}`);
+      return;
+    }
+    if (!pw) {
+      toast.error("Please enter your password");
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
-      const demo = demoUsers[role];
-      const userId = id || demo.id;
-      login({ ...demo, id: userId, role });
-      toast.success(`Welcome, ${demo.name}`);
+      const namePart = email.split("@")[0];
+      const isStudent = role === "student";
+      login({
+        id: isStudent ? namePart.toUpperCase() : namePart,
+        name: isStudent ? namePart.toUpperCase() : namePart.charAt(0).toUpperCase() + namePart.slice(1),
+        email,
+        role,
+        ...(isStudent && { department: "CSE", rollNumber: namePart.toUpperCase() }),
+        ...(!isStudent && { designation: role === "admin" ? "Principal" : "Registrar" }),
+      });
+      toast.success(`Welcome, signed in as ${meta.label}`);
       navigate(`/${role}`);
     }, 900);
   };
 
-  const useDemo = () => {
-    const demo = demoUsers[role];
-    setId(demo.id);
-    setPw("demo1234");
-  };
-
   return (
     <div className="min-h-screen relative overflow-hidden gradient-bg flex items-center justify-center p-4">
-      {/* Floating blobs */}
       <div className="absolute top-1/4 -left-20 h-72 w-72 rounded-full bg-primary/30 blur-3xl animate-blob" />
       <div className="absolute bottom-1/4 -right-20 h-72 w-72 rounded-full bg-primary-glow/30 blur-3xl animate-blob" style={{ animationDelay: "3s" }} />
 
       <div className="relative w-full max-w-5xl grid lg:grid-cols-2 gap-8 items-center">
-        {/* Brand side */}
         <div className="hidden lg:block space-y-6 animate-fade-in">
           <div className="inline-flex items-center gap-2 glass rounded-full px-4 py-1.5 text-xs font-medium">
             <Sparkles className="h-3.5 w-3.5 text-primary" />
@@ -83,21 +89,20 @@ export default function Login() {
           </div>
         </div>
 
-        {/* Login card */}
-        <Card className="glass-strong p-6 sm:p-8 border-white/50 animate-scale-in">
+        <Card className="glass-strong p-6 sm:p-8 border-white/50 dark:border-white/10 animate-scale-in">
           <div className="flex items-center gap-3 mb-6">
             <div className="rounded-xl p-2.5 bg-gradient-to-br from-primary to-primary-glow btn-glow">
               <ShieldCheck className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
               <h2 className="font-display text-xl font-bold">Sign in</h2>
-              <p className="text-xs text-muted-foreground">Choose your role to continue</p>
+              <p className="text-xs text-muted-foreground">Use your college email to continue</p>
             </div>
           </div>
 
-          <Tabs value={role} onValueChange={(v) => setRole(v as Role)} className="mb-6">
+          <Tabs value={role} onValueChange={(v) => { setRole(v as Role); setEmail(""); setPw(""); }} className="mb-6">
             <TabsList className="grid w-full grid-cols-3 glass">
-              {(["student", "admin", "management"] as Role[]).map((r) => {
+              {(["student", "management", "admin"] as Role[]).map((r) => {
                 const M = tabMeta[r];
                 return (
                   <TabsTrigger key={r} value={r} className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary-glow data-[state=active]:text-primary-foreground">
@@ -108,12 +113,24 @@ export default function Login() {
               })}
             </TabsList>
 
-            {(["student", "admin", "management"] as Role[]).map((r) => (
+            {(["student", "management", "admin"] as Role[]).map((r) => (
               <TabsContent key={r} value={r}>
                 <form onSubmit={handleSubmit} className="space-y-4 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="uid">{tabMeta[r].idLabel}</Label>
-                    <Input id="uid" placeholder={tabMeta[r].placeholder} value={id} onChange={(e) => setId(e.target.value)} className="glass" />
+                    <Label htmlFor="email">{tabMeta[r].idLabel}</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder={tabMeta[r].placeholder}
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="glass"
+                    />
+                    <p className="text-[11px] text-muted-foreground">
+                      {r === "student"
+                        ? "Use your roll number followed by @mrit.ac.in"
+                        : "Use your name followed by @mlrit.ac.in"}
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="pw">Password</Label>
@@ -143,10 +160,6 @@ export default function Login() {
                   >
                     {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : `Sign in as ${tabMeta[r].label}`}
                   </Button>
-
-                  <button type="button" onClick={useDemo} className="w-full text-xs text-primary hover:underline">
-                    Use demo credentials
-                  </button>
                 </form>
               </TabsContent>
             ))}

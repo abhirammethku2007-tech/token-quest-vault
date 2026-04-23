@@ -39,15 +39,17 @@ const App = () => (
             <Route path="/student/certificates" element={<ProtectedRoute role="student"><MyCertificates /></ProtectedRoute>} />
             <Route path="/student/profile" element={<ProtectedRoute role="student"><StudentProfile /></ProtectedRoute>} />
 
-            <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
-            <Route path="/admin/requests" element={<ProtectedRoute role="admin"><AdminRequests /></ProtectedRoute>} />
-            <Route path="/admin/generate" element={<ProtectedRoute role="admin"><CertificateGeneration /></ProtectedRoute>} />
-            <Route path="/admin/users" element={<ProtectedRoute role="admin"><AdminUsers /></ProtectedRoute>} />
-
+            {/* Management handles day-to-day: requests, certificate generation, user mgmt */}
             <Route path="/management" element={<ProtectedRoute role="management"><ManagementDashboard /></ProtectedRoute>} />
-            <Route path="/management/analytics" element={<ProtectedRoute role="management"><ManagementAnalytics /></ProtectedRoute>} />
-            <Route path="/management/audit" element={<ProtectedRoute role="management"><AuditLogs /></ProtectedRoute>} />
-            <Route path="/management/signatures" element={<ProtectedRoute role="management"><SignatureKeys /></ProtectedRoute>} />
+            <Route path="/management/requests" element={<ProtectedRoute role="management"><AdminRequests /></ProtectedRoute>} />
+            <Route path="/management/generate" element={<ProtectedRoute role="management"><CertificateGeneration /></ProtectedRoute>} />
+            <Route path="/management/users" element={<ProtectedRoute role="management"><AdminUsers /></ProtectedRoute>} />
+
+            {/* Admin (Principal) sees analytics, audit, signatures */}
+            <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/analytics" element={<ProtectedRoute role="admin"><ManagementAnalytics /></ProtectedRoute>} />
+            <Route path="/admin/audit" element={<ProtectedRoute role="admin"><AuditLogs /></ProtectedRoute>} />
+            <Route path="/admin/signatures" element={<ProtectedRoute role="admin"><SignatureKeys /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>
