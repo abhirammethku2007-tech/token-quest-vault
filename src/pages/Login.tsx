@@ -10,7 +10,7 @@ import { useAuth, Role } from "@/context/AuthContext";
 import { toast } from "sonner";
 
 const tabMeta: Record<Role, { label: string; icon: any; idLabel: string; placeholder: string; emailDomain: string }> = {
-  student: { label: "Student", icon: GraduationCap, idLabel: "College Email", placeholder: "21CSE011@mrit.ac.in", emailDomain: "@mrit.ac.in" },
+  student: { label: "Student", icon: GraduationCap, idLabel: "College Email", placeholder: "21CSE011@mlrit.ac.in", emailDomain: "@mlrit.ac.in" },
   admin: { label: "Admin", icon: Building2, idLabel: "College Email", placeholder: "principal@mlrit.ac.in", emailDomain: "@mlrit.ac.in" },
   management: { label: "Management", icon: ShieldCheck, idLabel: "College Email", placeholder: "neha@mlrit.ac.in", emailDomain: "@mlrit.ac.in" },
 };
