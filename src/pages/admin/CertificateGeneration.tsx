@@ -9,6 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { FauxQR } from "@/components/FauxQR";
 import { ShieldCheck, FileSignature, Download, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { generateCertificatePDF } from "@/lib/generateCertificatePDF";
 
 export default function CertificateGeneration() {
   const { user } = useAuth();
@@ -87,10 +88,16 @@ export default function CertificateGeneration() {
               </Button>
               <Button
                 variant="outline"
-                disabled={!sel?.certificate_url}
-                onClick={() => sel?.certificate_url
-                  ? window.open(sel.certificate_url, "_blank")
-                  : toast.info("PDF not yet generated")}
+                disabled={!sel}
+                onClick={() => {
+                  if (!sel) return;
+                  if (sel.certificate_url) {
+                    window.open(sel.certificate_url, "_blank");
+                  } else {
+                    generateCertificatePDF(sel);
+                    toast.success(`Downloaded ${sel.token}.pdf`);
+                  }
+                }}
               >
                 <Download className="h-4 w-4 mr-2" /> Download PDF
               </Button>

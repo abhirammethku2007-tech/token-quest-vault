@@ -11,6 +11,7 @@ import { Download, Clock, Users, MessageSquare, ShieldCheck } from "lucide-react
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import type { CertRequestRow } from "@/lib/database.types";
+import { generateCertificatePDF } from "@/lib/generateCertificatePDF";
 
 function formatEta(mins: number) {
   if (mins <= 0) return "Ready";
@@ -80,11 +81,14 @@ function CertCard({ r, queueLength }: { r: CertRequestRow; queueLength: number }
               Signed • {r.signature_id}
             </div>
             <Button
-              onClick={() =>
-                r.certificate_url
-                  ? window.open(r.certificate_url, "_blank")
-                  : toast.info("Certificate PDF not yet generated")
-              }
+              onClick={() => {
+                if (r.certificate_url) {
+                  window.open(r.certificate_url, "_blank");
+                } else {
+                  generateCertificatePDF(r);
+                  toast.success(`Downloading ${r.token}.pdf`);
+                }
+              }}
               className="bg-gradient-to-r from-primary to-primary-glow text-primary-foreground"
             >
               <Download className="h-4 w-4 mr-2" /> Download
