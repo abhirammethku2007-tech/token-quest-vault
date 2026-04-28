@@ -39,7 +39,7 @@ export default function ManagementDashboard() {
     <AppShell role="admin">
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
-          <h1 className="font-display text-3xl font-bold">Management Overview</h1>
+          <h1 className="font-display text-3xl font-bold">Admin Overview</h1>
           <p className="text-muted-foreground mt-1">Institution-wide insights and monitoring.</p>
         </div>
 
