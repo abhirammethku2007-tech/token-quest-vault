@@ -1,189 +1,255 @@
 import jsPDF from "jspdf";
+import QRCode from "qrcode";
 import type { CertRequestRow } from "./database.types";
 
 // ─── Colour palette ───────────────────────────────────────────
-const PRIMARY   = [99,  102, 241] as const;  // indigo-500
-const DARK      = [30,  27,  75]  as const;  // deep navy
-const LIGHT_BG  = [245, 245, 255] as const;  // near-white
-const GOLD      = [180, 140, 40]  as const;  // border accent
-const MUTED     = [120, 120, 140] as const;
+const INDIGO  = [79,  70,  229] as const;
+const PURPLE  = [124, 58,  237] as const;
+const DARK    = [30,  27,  75]  as const;
+const MUTED   = [107, 114, 128] as const;
+const LIGHT   = [249, 250, 251] as const;
+const WHITE   = [255, 255, 255] as const;
+const GREEN   = [22,  163, 74]  as const;
+const AMBER   = [217, 119, 6]   as const;
 
 // ─── Helpers ──────────────────────────────────────────────────
-function rgb(c: readonly [number, number, number]) {
-  return { r: c[0], g: c[1], b: c[2] };
+function setFill(doc: jsPDF, c: readonly [number, number, number]) {
+  doc.setFillColor(c[0], c[1], c[2]);
+}
+function setDraw(doc: jsPDF, c: readonly [number, number, number]) {
+  doc.setDrawColor(c[0], c[1], c[2]);
+}
+function setTxt(doc: jsPDF, c: readonly [number, number, number]) {
+  doc.setTextColor(c[0], c[1], c[2]);
 }
 
-function drawBorder(doc: jsPDF, margin: number) {
-  const w = doc.internal.pageSize.getWidth();
-  const h = doc.internal.pageSize.getHeight();
-  // Outer gold border
-  doc.setDrawColor(...GOLD);
-  doc.setLineWidth(2);
-  doc.rect(margin, margin, w - margin * 2, h - margin * 2);
-  // Inner thin border
-  doc.setLineWidth(0.5);
-  doc.rect(margin + 4, margin + 4, w - (margin + 4) * 2, h - (margin + 4) * 2);
+// Draw a gradient-like top/bottom bar using two rects
+function drawBar(doc: jsPDF, y: number, h: number, W: number) {
+  setFill(doc, INDIGO);
+  doc.rect(0, y, W / 2, h, "F");
+  setFill(doc, PURPLE);
+  doc.rect(W / 2, y, W / 2, h, "F");
 }
 
-function drawQR(doc: jsPDF, value: string, x: number, y: number, size: number) {
-  // Simple deterministic pixel pattern as a stand-in QR code
-  const cell = size / 10;
-  const hash = value.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
-  doc.setFillColor(30, 27, 75);
-  for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 10; col++) {
-      if ((hash * (row + 1) * (col + 1)) % 3 !== 0) {
-        doc.rect(x + col * cell, y + row * cell, cell - 0.5, cell - 0.5, "F");
-      }
-    }
-  }
-  // Corner markers
-  [[0,0],[0,7],[7,0]].forEach(([r,c]) => {
-    doc.setFillColor(...PRIMARY);
-    doc.rect(x + c * cell, y + r * cell, cell * 3, cell * 3, "F");
-    doc.setFillColor(255,255,255);
-    doc.rect(x + c * cell + cell * 0.5, y + r * cell + cell * 0.5, cell * 2, cell * 2, "F");
-    doc.setFillColor(...PRIMARY);
-    doc.rect(x + c * cell + cell, y + r * cell + cell, cell, cell, "F");
-  });
+// Corner bracket ornament
+function drawCorner(doc: jsPDF, x: number, y: number, size: number, flipX: boolean, flipY: boolean) {
+  setDraw(doc, [199, 210, 254]); // indigo-200
+  doc.setLineWidth(1.2);
+  const sx = flipX ? -1 : 1;
+  const sy = flipY ? -1 : 1;
+  doc.line(x, y, x + sx * size, y);
+  doc.line(x, y, x, y + sy * size);
 }
+
+// Certificate body text per type
+const BODY: Record<string, string> = {
+  "Bonafide":
+    "is a bonafide student of this institution and is currently pursuing studies for the academic year 2025–2026.",
+  "Study Certificate":
+    "has been a student of this institution and has successfully completed the prescribed course of study for the academic year 2025–2026.",
+  "Fee Receipt":
+    "has duly paid all prescribed tuition fees, examination fees, and other charges for the academic year 2025–2026.",
+  "Fee Due Certificate":
+    "has the following fee dues pending with this institution for the academic year 2025–2026.",
+  "No Fee Due Certificate":
+    "has fully cleared all prescribed fees and charges to this institution for the academic year 2025–2026. No fee dues are pending.",
+};
 
 // ─── Main export ──────────────────────────────────────────────
-export function generateCertificatePDF(request: CertRequestRow): void {
-  const doc  = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
-  const W    = doc.internal.pageSize.getWidth();   // 297
-  const H    = doc.internal.pageSize.getHeight();  // 210
-  const M    = 14; // margin
-  const cx   = W / 2;
+export async function generateCertificatePDF(request: CertRequestRow): Promise<void> {
+  const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+  const W   = doc.internal.pageSize.getWidth();   // 297
+  const H   = doc.internal.pageSize.getHeight();  // 210
+  const cx  = W / 2;
+  const M   = 14;
 
   // ── Background ──────────────────────────────────────────────
-  doc.setFillColor(...LIGHT_BG);
+  setFill(doc, LIGHT);
   doc.rect(0, 0, W, H, "F");
 
-  // Subtle gradient strip at top
-  doc.setFillColor(...PRIMARY);
-  doc.rect(0, 0, W, 18, "F");
+  // ── Top & bottom bars ────────────────────────────────────────
+  drawBar(doc, 0, 5, W);
+  drawBar(doc, H - 5, 5, W);
 
-  // ── Border ──────────────────────────────────────────────────
-  drawBorder(doc, M);
+  // ── Corner ornaments ─────────────────────────────────────────
+  const cs = 18;
+  drawCorner(doc, M,     M,     cs, false, false);
+  drawCorner(doc, W - M, M,     cs, true,  false);
+  drawCorner(doc, M,     H - M, cs, false, true);
+  drawCorner(doc, W - M, H - M, cs, true,  true);
 
-  // ── Header strip text ────────────────────────────────────────
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(9);
-  doc.setFont("helvetica", "normal");
-  doc.text("MLRIT — MARRI LAXMAN REDDY INSTITUTE OF TECHNOLOGY & MANAGEMENT", cx, 11, { align: "center" });
+  // ── Watermark ────────────────────────────────────────────────
+  doc.setTextColor(237, 233, 254); // very light indigo
+  doc.setFontSize(80);
+  doc.setFont("helvetica", "bold");
+  doc.text("CERTIFIED", cx, H / 2 + 20, { align: "center", angle: -15 });
+
+  // ── Logo circle ──────────────────────────────────────────────
+  setFill(doc, INDIGO);
+  doc.circle(cx, 28, 8, "F");
+  setTxt(doc, WHITE);
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.text("CV", cx, 30.5, { align: "center" });
 
   // ── College name ─────────────────────────────────────────────
-  doc.setTextColor(...DARK);
-  doc.setFontSize(22);
+  setTxt(doc, DARK);
+  doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
-  doc.text("CertVault College", cx, 32, { align: "center" });
+  doc.text("MLRIT CertVault", cx, 42, { align: "center" });
 
-  doc.setFontSize(9);
+  setTxt(doc, MUTED);
+  doc.setFontSize(7.5);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(...MUTED);
-  doc.text("Office of the Registrar  •  Hyderabad, Telangana", cx, 38, { align: "center" });
+  doc.text("MARRI LAXMAN REDDY INSTITUTE OF TECHNOLOGY & MANAGEMENT", cx, 47, { align: "center" });
 
   // ── Divider ──────────────────────────────────────────────────
-  doc.setDrawColor(...GOLD);
-  doc.setLineWidth(0.8);
-  doc.line(M + 10, 42, W - M - 10, 42);
+  setDraw(doc, [199, 210, 254]);
+  doc.setLineWidth(0.5);
+  doc.line(M + 20, 51, W - M - 20, 51);
 
-  // ── Certificate type heading ─────────────────────────────────
-  doc.setFontSize(26);
+  setTxt(doc, MUTED);
+  doc.setFontSize(7);
+  doc.text("OFFICE OF THE REGISTRAR", cx, 56, { align: "center" });
+
+  // ── Certificate type ─────────────────────────────────────────
+  setTxt(doc, INDIGO);
+  doc.setFontSize(22);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(...PRIMARY);
-  doc.text(request.type.toUpperCase(), cx, 54, { align: "center" });
-
-  // ── Body text ────────────────────────────────────────────────
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(...DARK);
-  doc.text("This is to certify that", cx, 64, { align: "center" });
-
-  // Student name
-  doc.setFontSize(20);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...PRIMARY);
-  doc.text(request.student_name, cx, 74, { align: "center" });
+  doc.text(request.type.toUpperCase(), cx, 66, { align: "center" });
 
   // Underline
-  const nameW = doc.getTextWidth(request.student_name);
-  doc.setDrawColor(...PRIMARY);
+  const tw = doc.getTextWidth(request.type.toUpperCase());
+  setDraw(doc, INDIGO);
+  doc.setLineWidth(0.6);
+  doc.line(cx - tw / 2, 68, cx + tw / 2, 68);
+
+  // ── Body ─────────────────────────────────────────────────────
+  setTxt(doc, MUTED);
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "italic");
+  doc.text("This is to certify that", cx, 76, { align: "center" });
+
+  // Student name
+  setTxt(doc, DARK);
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  doc.text(request.student_name, cx, 85, { align: "center" });
+
+  // Name underline
+  const nw = doc.getTextWidth(request.student_name);
+  setDraw(doc, PURPLE);
   doc.setLineWidth(0.4);
-  doc.line(cx - nameW / 2, 76, cx + nameW / 2, 76);
+  doc.line(cx - nw / 2, 87, cx + nw / 2, 87);
 
-  // Details line
-  doc.setFontSize(11);
+  // Roll & dept
+  setTxt(doc, MUTED);
+  doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(...DARK);
-  const detailLine = `bearing Roll No. ${request.roll_number}  |  Department of ${request.department}`;
-  doc.text(detailLine, cx, 84, { align: "center" });
+  doc.text(
+    `Roll No. ${request.roll_number}   ·   Department of ${request.department}`,
+    cx, 93, { align: "center" }
+  );
 
-  // Certificate-specific body text
-  const bodyText: Record<string, string> = {
-    "Bonafide":
-      "is a bonafide student of this institution and is currently pursuing studies for the academic year 2025–2026.",
-    "Study Certificate":
-      "has been a student of this institution and has successfully completed the prescribed course of study for the academic year 2025–2026.",
-    "Fee Receipt":
-      "has duly paid all prescribed tuition fees, examination fees, and other charges for the academic year 2025–2026.",
-    "Fee Due Certificate":
-      "has the following fee dues pending with this institution for the academic year 2025–2026. This certificate is issued upon the student's request.",
-    "No Fee Due Certificate":
-      "has fully cleared all prescribed fees and charges to this institution for the academic year 2025–2026. No fee dues are pending.",
-  };
+  // Body text
+  const body = BODY[request.type] ?? "is a registered student of this institution.";
+  const lines = doc.splitTextToSize(body, 160);
+  setTxt(doc, [75, 85, 99]);
+  doc.setFontSize(9);
+  doc.text(lines, cx, 101, { align: "center" });
 
-  const body = bodyText[request.type] ?? "is a registered student of this institution.";
-  const lines = doc.splitTextToSize(body, W - M * 2 - 50);
-  doc.setFontSize(10.5);
-  doc.setTextColor(60, 60, 80);
-  doc.text(lines, cx, 94, { align: "center" });
+  // ── Divider ──────────────────────────────────────────────────
+  setDraw(doc, [229, 231, 235]);
+  doc.setLineWidth(0.3);
+  doc.line(M + 10, 118, W - M - 10, 118);
 
-  // ── Token & date row ─────────────────────────────────────────
+  // ── Footer row ───────────────────────────────────────────────
+  const footerY = 130;
+
+  // Left — token & date
+  setTxt(doc, MUTED);
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "normal");
+  doc.text("TOKEN", M + 18, footerY);
+  setTxt(doc, DARK);
+  doc.setFontSize(8.5);
+  doc.setFont("helvetica", "bold");
+  doc.text(request.token, M + 18, footerY + 5);
+
   const issued = new Date(request.updated_at).toLocaleDateString("en-IN", {
     day: "2-digit", month: "long", year: "numeric",
   });
+  setTxt(doc, MUTED);
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "normal");
+  doc.text("ISSUED ON", M + 18, footerY + 12);
+  setTxt(doc, DARK);
+  doc.setFontSize(8.5);
+  doc.setFont("helvetica", "bold");
+  doc.text(issued, M + 18, footerY + 17);
 
-  doc.setFontSize(9);
-  doc.setTextColor(...MUTED);
-  doc.text(`Token: ${request.token}`, M + 20, 130);
-  doc.text(`Issued on: ${issued}`, M + 20, 136);
-  if (request.signature_id) {
-    doc.text(`Signature ID: ${request.signature_id}`, M + 20, 142);
+  // Center — QR code (real, scannable)
+  try {
+    const verifyUrl = `${window.location.origin}/verify/${request.token}`;
+    const qrDataUrl = await QRCode.toDataURL(verifyUrl, {
+      width: 200,
+      margin: 1,
+      color: { dark: "#1e1b4b", light: "#ffffff" },
+    });
+    const qrSize = 32;
+    doc.addImage(qrDataUrl, "PNG", cx - qrSize / 2, footerY - 6, qrSize, qrSize);
+    setTxt(doc, MUTED);
+    doc.setFontSize(6.5);
+    doc.setFont("helvetica", "normal");
+    doc.text("Scan to verify", cx, footerY + 28, { align: "center" });
+  } catch {
+    // fallback if QR fails
+    setTxt(doc, MUTED);
+    doc.setFontSize(7);
+    doc.text("[QR Code]", cx, footerY + 10, { align: "center" });
   }
 
-  // ── QR code ──────────────────────────────────────────────────
-  drawQR(doc, request.token, W - M - 44, 118, 30);
-  doc.setFontSize(7);
-  doc.setTextColor(...MUTED);
-  doc.text("Scan to verify", W - M - 29, 152, { align: "center" });
-
-  // ── Signature block ──────────────────────────────────────────
-  const sigX = cx;
-  doc.setDrawColor(...DARK);
-  doc.setLineWidth(0.4);
-  doc.line(sigX - 35, 148, sigX + 35, 148);
-
-  doc.setFontSize(11);
+  // Right — signature
+  const sigX = W - M - 40;
+  doc.setFontSize(13);
   doc.setFont("helvetica", "bolditalic");
-  doc.setTextColor(...PRIMARY);
-  doc.text("Dr. Ramesh Kumar", sigX, 144, { align: "center" });
+  setTxt(doc, INDIGO);
+  doc.text("Dr. Ramesh Kumar", sigX, footerY + 5, { align: "center" });
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(9);
-  doc.setTextColor(...MUTED);
-  doc.text("Principal  •  Digitally Signed", sigX, 152, { align: "center" });
+  setDraw(doc, DARK);
+  doc.setLineWidth(0.3);
+  doc.line(sigX - 28, footerY + 8, sigX + 28, footerY + 8);
 
-  // ── Footer strip ─────────────────────────────────────────────
-  doc.setFillColor(...PRIMARY);
-  doc.rect(0, H - 12, W, 12, "F");
-  doc.setTextColor(255, 255, 255);
+  setTxt(doc, MUTED);
   doc.setFontSize(7.5);
   doc.setFont("helvetica", "normal");
+  doc.text("Principal", sigX, footerY + 13, { align: "center" });
+
+  if (request.signature_id) {
+    setFill(doc, [240, 253, 244]);
+    setDraw(doc, [134, 239, 172]);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(sigX - 22, footerY + 16, 44, 8, 2, 2, "FD");
+    setTxt(doc, GREEN);
+    doc.setFontSize(6.5);
+    doc.text(`✓ ${request.signature_id}`, sigX, footerY + 21, { align: "center" });
+  } else {
+    setFill(doc, [255, 251, 235]);
+    setDraw(doc, [252, 211, 77]);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(sigX - 22, footerY + 16, 44, 8, 2, 2, "FD");
+    setTxt(doc, AMBER);
+    doc.setFontSize(6.5);
+    doc.text("Pending Signature", sigX, footerY + 21, { align: "center" });
+  }
+
+  // ── Bottom footer text ────────────────────────────────────────
+  setTxt(doc, WHITE);
+  doc.setFontSize(7);
+  doc.setFont("helvetica", "normal");
   doc.text(
-    "This certificate is digitally signed and can be verified at https://token-quest-vault.vercel.app",
-    cx, H - 5, { align: "center" }
+    `Verify at: ${window.location.origin}/verify/${request.token}`,
+    cx, H - 2, { align: "center" }
   );
 
   // ── Save ─────────────────────────────────────────────────────

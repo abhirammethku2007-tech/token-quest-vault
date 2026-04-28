@@ -86,8 +86,9 @@ function CertCard({ r, queueLength }: { r: CertRequestRow; queueLength: number }
                 if (r.certificate_url) {
                   window.open(r.certificate_url, "_blank");
                 } else {
-                  generateCertificatePDF(r);
-                  toast.success(`Downloading ${r.token}.pdf`);
+                  generateCertificatePDF(r)
+                    .then(() => toast.success(`Downloading ${r.token}.pdf`))
+                    .catch(() => toast.error("PDF generation failed"));
                 }
               }}
               className="bg-gradient-to-r from-primary to-primary-glow text-primary-foreground"
