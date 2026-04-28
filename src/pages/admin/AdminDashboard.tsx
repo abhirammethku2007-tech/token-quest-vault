@@ -21,7 +21,7 @@ export default function AdminDashboard() {
     <AppShell role="management">
       <div className="max-w-7xl mx-auto space-y-6">
         <div>
-          <h1 className="font-display text-3xl font-bold">Admin Dashboard</h1>
+          <h1 className="font-display text-3xl font-bold">Management Dashboard</h1>
           <p className="text-muted-foreground mt-1">Process certificate requests in fair token order.</p>
         </div>
 
