@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound.tsx";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import VerifyCertificate from "./pages/VerifyCertificate";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import RequestCertificate from "./pages/student/RequestCertificate";
 import MyCertificates from "./pages/student/MyCertificates";
@@ -19,10 +20,12 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminRequests from "./pages/admin/AdminRequests";
 import CertificateGeneration from "./pages/admin/CertificateGeneration";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminProfile from "./pages/admin/AdminProfile";
 import ManagementDashboard from "./pages/management/ManagementDashboard";
 import ManagementAnalytics from "./pages/management/ManagementAnalytics";
 import AuditLogs from "./pages/management/AuditLogs";
 import SignatureKeys from "./pages/management/SignatureKeys";
+import ManagementProfile from "./pages/management/ManagementProfile";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +41,7 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/verify/:token" element={<VerifyCertificate />} />
 
             <Route path="/student" element={<ProtectedRoute role="student"><StudentDashboard /></ProtectedRoute>} />
             <Route path="/student/request" element={<ProtectedRoute role="student"><RequestCertificate /></ProtectedRoute>} />
@@ -48,11 +52,13 @@ const App = () => (
             <Route path="/management/requests" element={<ProtectedRoute role="management"><AdminRequests /></ProtectedRoute>} />
             <Route path="/management/generate" element={<ProtectedRoute role="management"><CertificateGeneration /></ProtectedRoute>} />
             <Route path="/management/users" element={<ProtectedRoute role="management"><AdminUsers /></ProtectedRoute>} />
+            <Route path="/management/profile" element={<ProtectedRoute role="management"><ManagementProfile /></ProtectedRoute>} />
 
             <Route path="/admin" element={<ProtectedRoute role="admin"><ManagementDashboard /></ProtectedRoute>} />
             <Route path="/admin/analytics" element={<ProtectedRoute role="admin"><ManagementAnalytics /></ProtectedRoute>} />
             <Route path="/admin/audit" element={<ProtectedRoute role="admin"><AuditLogs /></ProtectedRoute>} />
             <Route path="/admin/signatures" element={<ProtectedRoute role="admin"><SignatureKeys /></ProtectedRoute>} />
+            <Route path="/admin/profile" element={<ProtectedRoute role="admin"><AdminProfile /></ProtectedRoute>} />
 
             <Route path="*" element={<NotFound />} />
           </Routes>

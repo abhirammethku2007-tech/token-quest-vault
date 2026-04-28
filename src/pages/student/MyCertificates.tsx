@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/StatusBadge";
 import { FauxQR } from "@/components/FauxQR";
+import { RealQR } from "@/components/RealQR";
 import { useAuth } from "@/context/AuthContext";
 import { useStudentRequests, getQueuePosition, estimateWaitMinutes } from "@/lib/useRequests";
 import { Download, Clock, Users, MessageSquare, ShieldCheck } from "lucide-react";
@@ -44,7 +45,7 @@ function CertCard({ r, queueLength }: { r: CertRequestRow; queueLength: number }
             Submitted {new Date(r.created_at).toLocaleDateString()}
           </p>
         </div>
-        {r.status === "Approved" && <FauxQR value={r.token} size={72} />}
+        {r.status === "Approved" && <RealQR value={r.token} size={72} />}
       </div>
 
       {inQueue && (

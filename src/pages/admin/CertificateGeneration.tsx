@@ -7,6 +7,7 @@ import { useAllRequests } from "@/lib/useRequests";
 import { updateRequestStatus, writeAuditLog } from "@/lib/supabaseService";
 import { useAuth } from "@/context/AuthContext";
 import { FauxQR } from "@/components/FauxQR";
+import { RealQR } from "@/components/RealQR";
 import { ShieldCheck, FileSignature, Download, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { generateCertificatePDF } from "@/lib/generateCertificatePDF";
@@ -145,7 +146,7 @@ export default function CertificateGeneration() {
                       <p className="font-mono text-sm">{sel.token}</p>
                     </div>
                     <div className="text-center">
-                      <FauxQR value={sel.token} size={84} />
+                      <RealQR value={sel.token} size={84} />
                       <p className="text-[10px] text-muted-foreground mt-1">Scan to verify</p>
                     </div>
                     <div className="text-right">

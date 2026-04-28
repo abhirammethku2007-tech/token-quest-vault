@@ -29,12 +29,14 @@ const navByRole: Record<Role, NavItem[]> = {
     { to: "/management/requests", label: "Requests", icon: Inbox },
     { to: "/management/generate", label: "Generate Certificate", icon: FileSignature },
     { to: "/management/users", label: "User Management", icon: Users },
+    { to: "/management/profile", label: "My Profile", icon: User },
   ],
   admin: [
     { to: "/admin", label: "Overview", icon: LayoutDashboard },
     { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
     { to: "/admin/audit", label: "Audit Logs", icon: ScrollText },
     { to: "/admin/signatures", label: "Signature Keys", icon: KeyRound },
+    { to: "/admin/profile", label: "My Profile", icon: User },
   ],
 };
 
