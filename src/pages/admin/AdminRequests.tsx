@@ -4,42 +4,70 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
 import { StatusBadge } from "@/components/StatusBadge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useRequests } from "@/lib/useRequests";
-import { CertRequest, RequestStatus } from "@/lib/mockStore";
+import { useAllRequests } from "@/lib/useRequests";
+import { updateRequestStatus, writeAuditLog } from "@/lib/supabaseService";
+import { useAuth } from "@/context/AuthContext";
+import type { CertRequestRow, RequestStatus } from "@/lib/database.types";
 import { Check, Eye, Search, X } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminRequests() {
-  const { store } = useRequests();
-  const [filter, setFilter] = useState<"queue" | "all" | "approved" | "rejected">("queue");
-  const [q, setQ] = useState("");
-  const [open, setOpen] = useState<CertRequest | null>(null);
-  const [remarks, setRemarks] = useState("");
+  const { user } = useAuth();
+  const { requests, pendingQueue, loading } = useAllRequests();
 
-  let rows: CertRequest[] =
-    filter === "queue" ? store.pendingQueue()
-      : filter === "approved" ? store.list().filter((r) => r.status === "Approved")
-      : filter === "rejected" ? store.list().filter((r) => r.status === "Rejected")
-      : store.list();
+  const [filter,  setFilter]  = useState<"queue" | "all" | "approved" | "rejected">("queue");
+  const [q,       setQ]       = useState("");
+  const [open,    setOpen]    = useState<CertRequestRow | null>(null);
+  const [remarks, setRemarks] = useState("");
+  const [acting,  setActing]  = useState(false);
+
+  let rows: CertRequestRow[] =
+    filter === "queue"    ? pendingQueue
+    : filter === "approved" ? requests.filter((r) => r.status === "Approved")
+    : filter === "rejected" ? requests.filter((r) => r.status === "Rejected")
+    : requests;
 
   if (q.trim()) {
     const s = q.toLowerCase();
     rows = rows.filter((r) =>
-      r.studentName.toLowerCase().includes(s) ||
+      r.student_name.toLowerCase().includes(s) ||
       r.token.toLowerCase().includes(s) ||
-      r.rollNumber.toLowerCase().includes(s)
+      r.roll_number.toLowerCase().includes(s)
     );
   }
 
-  const act = (id: string, status: RequestStatus) => {
-    store.updateStatus(id, status, remarks || undefined);
-    toast.success(`Request ${status.toLowerCase()}`);
-    setOpen(null);
-    setRemarks("");
+  const act = async (id: string, status: RequestStatus) => {
+    setActing(true);
+    try {
+      await updateRequestStatus(id, status, { remarks: remarks || undefined });
+      // Write audit log
+      if (user) {
+        const target = requests.find((r) => r.id === id)?.token ?? id;
+        await writeAuditLog({
+          timestamp:  new Date().toISOString(),
+          actor_id:   user.id,
+          actor_name: user.name,
+          actor_role: user.role,
+          action:     status === "Approved" ? "Approved Request"
+                    : status === "Rejected" ? "Rejected Request"
+                    : "Marked Under Review",
+          target,
+          details: remarks || null,
+        });
+      }
+      toast.success(`Request ${status.toLowerCase()}`);
+      setOpen(null);
+      setRemarks("");
+    } catch (err: any) {
+      toast.error(err?.message ?? "Action failed");
+    } finally {
+      setActing(false);
+    }
   };
 
   return (
@@ -78,12 +106,17 @@ export default function AdminRequests() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((r, i) => (
+              {loading && Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell colSpan={6}><Skeleton className="h-8 w-full" /></TableCell>
+                </TableRow>
+              ))}
+              {!loading && rows.map((r, i) => (
                 <TableRow key={r.id} className="hover:bg-accent/40">
                   <TableCell className="font-medium text-muted-foreground">{i + 1}</TableCell>
                   <TableCell>
-                    <p className="font-medium">{r.studentName}</p>
-                    <p className="text-xs text-muted-foreground">{r.rollNumber} • {r.department}</p>
+                    <p className="font-medium">{r.student_name}</p>
+                    <p className="text-xs text-muted-foreground">{r.roll_number} • {r.department}</p>
                   </TableCell>
                   <TableCell className="font-mono text-xs">{r.token}</TableCell>
                   <TableCell>{r.type}</TableCell>
@@ -94,12 +127,14 @@ export default function AdminRequests() {
                         <Eye className="h-4 w-4" />
                       </Button>
                       {r.status !== "Approved" && (
-                        <Button size="icon" variant="ghost" className="text-success hover:bg-success/10" onClick={() => { setOpen(r); setRemarks(""); }}>
+                        <Button size="icon" variant="ghost" className="text-success hover:bg-success/10"
+                          onClick={() => { setOpen(r); setRemarks(""); }}>
                           <Check className="h-4 w-4" />
                         </Button>
                       )}
                       {r.status !== "Rejected" && (
-                        <Button size="icon" variant="ghost" className="text-destructive hover:bg-destructive/10" onClick={() => { setOpen(r); setRemarks(""); }}>
+                        <Button size="icon" variant="ghost" className="text-destructive hover:bg-destructive/10"
+                          onClick={() => { setOpen(r); setRemarks(""); }}>
                           <X className="h-4 w-4" />
                         </Button>
                       )}
@@ -107,8 +142,10 @@ export default function AdminRequests() {
                   </TableCell>
                 </TableRow>
               ))}
-              {rows.length === 0 && (
-                <TableRow><TableCell colSpan={6} className="text-center py-12 text-muted-foreground">No requests</TableCell></TableRow>
+              {!loading && rows.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">No requests</TableCell>
+                </TableRow>
               )}
             </TableBody>
           </Table>
@@ -123,26 +160,41 @@ export default function AdminRequests() {
           {open && (
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <Field label="Student" value={open.studentName} />
-                <Field label="Roll" value={open.rollNumber} />
+                <Field label="Student"    value={open.student_name} />
+                <Field label="Roll"       value={open.roll_number} />
                 <Field label="Department" value={open.department} />
-                <Field label="Type" value={open.type} />
-                <Field label="Token" value={open.token} mono />
-                <Field label="Status" value={open.status} />
+                <Field label="Type"       value={open.type} />
+                <Field label="Token"      value={open.token} mono />
+                <Field label="Status"     value={open.status} />
               </div>
-              {open.reason && <div className="text-sm"><p className="text-xs text-muted-foreground mb-1">Reason</p><p>{open.reason}</p></div>}
+              {open.reason && (
+                <div className="text-sm">
+                  <p className="text-xs text-muted-foreground mb-1">Reason</p>
+                  <p>{open.reason}</p>
+                </div>
+              )}
               <div className="space-y-1.5">
                 <p className="text-xs text-muted-foreground">Remarks</p>
-                <Textarea value={remarks} onChange={(e) => setRemarks(e.target.value)} placeholder="Optional notes for the student" className="glass" />
+                <Textarea
+                  value={remarks}
+                  onChange={(e) => setRemarks(e.target.value)}
+                  placeholder="Optional notes for the student"
+                  className="glass"
+                />
               </div>
             </div>
           )}
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => open && act(open.id, "Under Review")}>Mark Under Review</Button>
-            <Button variant="outline" className="text-destructive border-destructive/30 hover:bg-destructive/10" onClick={() => open && act(open.id, "Rejected")}>
+            <Button variant="outline" disabled={acting} onClick={() => open && act(open.id, "Under Review")}>
+              Mark Under Review
+            </Button>
+            <Button variant="outline" disabled={acting}
+              className="text-destructive border-destructive/30 hover:bg-destructive/10"
+              onClick={() => open && act(open.id, "Rejected")}>
               <X className="h-4 w-4 mr-1.5" /> Reject
             </Button>
-            <Button onClick={() => open && act(open.id, "Approved")} className="bg-gradient-to-r from-primary to-primary-glow text-primary-foreground">
+            <Button disabled={acting} onClick={() => open && act(open.id, "Approved")}
+              className="bg-gradient-to-r from-primary to-primary-glow text-primary-foreground">
               <Check className="h-4 w-4 mr-1.5" /> Approve
             </Button>
           </DialogFooter>
@@ -152,11 +204,11 @@ export default function AdminRequests() {
   );
 }
 
-function Field({ label, value, mono }: { label: string; value?: string; mono?: boolean }) {
+function Field({ label, value, mono }: { label: string; value?: string | null; mono?: boolean }) {
   return (
     <div>
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className={mono ? "font-mono text-sm" : "font-medium"}>{value}</p>
+      <p className={mono ? "font-mono text-sm" : "font-medium"}>{value ?? "—"}</p>
     </div>
   );
 }

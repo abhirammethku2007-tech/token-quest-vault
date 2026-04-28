@@ -1,12 +1,51 @@
 import { useEffect, useState } from "react";
-import { store } from "./mockStore";
+import { useAuth } from "@/context/AuthContext";
+import {
+  subscribeToRequests,
+  subscribeToStudentRequests,
+  getPendingQueue,
+  getQueuePosition,
+  estimateWaitMinutes,
+} from "./supabaseService";
+import type { CertRequestRow } from "./database.types";
 
-export function useRequests() {
-  const [version, setVersion] = useState(0);
+// ─── Management / Admin hook — all requests ───────────────────
+export function useAllRequests() {
+  const [requests, setRequests] = useState<CertRequestRow[]>([]);
+  const [loading, setLoading]   = useState(true);
+
   useEffect(() => {
-    const handler = () => setVersion((v) => v + 1);
-    window.addEventListener("ccp:requests:update", handler);
-    return () => window.removeEventListener("ccp:requests:update", handler);
+    const unsub = subscribeToRequests((data) => {
+      setRequests(data);
+      setLoading(false);
+    });
+    return unsub;
   }, []);
-  return { all: store.list(), version, store };
+
+  const pendingQueue = requests.filter(
+    (r) => r.status === "Pending" || r.status === "Under Review"
+  ).sort((a, b) => a.created_at.localeCompare(b.created_at));
+
+  return { requests, pendingQueue, loading };
 }
+
+// ─── Student hook — own requests only ────────────────────────
+export function useStudentRequests() {
+  const { user } = useAuth();
+  const [requests, setRequests] = useState<CertRequestRow[]>([]);
+  const [loading, setLoading]   = useState(true);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const unsub = subscribeToStudentRequests(user.id, (data) => {
+      setRequests(data);
+      setLoading(false);
+    });
+    return unsub;
+  }, [user?.id]);
+
+  return { requests, loading };
+}
+
+// ─── Queue helpers ────────────────────────────────────────────
+export { getQueuePosition, estimateWaitMinutes };

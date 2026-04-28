@@ -83,6 +83,13 @@ export default function LandingPage() {
               Sign In
             </Button>
             <Button
+              variant="outline"
+              onClick={() => navigate("/login?mode=signup")}
+              className="glass hidden sm:flex"
+            >
+              Create Account
+            </Button>
+            <Button
               onClick={() => navigate("/login")}
               className="bg-gradient-to-r from-primary to-primary-glow text-primary-foreground btn-glow hover:opacity-90 transition-all hover:scale-105"
             >
@@ -120,15 +127,15 @@ export default function LandingPage() {
               onClick={() => navigate("/login")}
               className="bg-gradient-to-r from-primary to-primary-glow text-primary-foreground btn-glow hover:opacity-90 text-base px-8 py-6 transition-all hover:scale-105"
             >
-              Get Started <ArrowRight className="h-5 w-5 ml-2" />
+              Sign In <ArrowRight className="h-5 w-5 ml-2" />
             </Button>
             <Button
               size="lg"
               variant="outline"
-              onClick={() => document.getElementById("features")?.scrollIntoView({ behavior: "smooth" })}
+              onClick={() => navigate("/login?mode=signup")}
               className="glass text-base px-8 py-6 hover:bg-accent/50"
             >
-              Learn More <ChevronRight className="h-5 w-5 ml-1" />
+              Create Account <ChevronRight className="h-5 w-5 ml-1" />
             </Button>
           </div>
         </div>

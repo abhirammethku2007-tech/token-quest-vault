@@ -9,6 +9,8 @@ import Index from "./pages/Index.tsx";
 import LandingPage from "./pages/LandingPage";
 import NotFound from "./pages/NotFound.tsx";
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import RequestCertificate from "./pages/student/RequestCertificate";
 import MyCertificates from "./pages/student/MyCertificates";
@@ -34,19 +36,19 @@ const App = () => (
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
 
             <Route path="/student" element={<ProtectedRoute role="student"><StudentDashboard /></ProtectedRoute>} />
             <Route path="/student/request" element={<ProtectedRoute role="student"><RequestCertificate /></ProtectedRoute>} />
             <Route path="/student/certificates" element={<ProtectedRoute role="student"><MyCertificates /></ProtectedRoute>} />
             <Route path="/student/profile" element={<ProtectedRoute role="student"><StudentProfile /></ProtectedRoute>} />
 
-            {/* Management handles day-to-day: requests, certificate generation, user mgmt */}
             <Route path="/management" element={<ProtectedRoute role="management"><AdminDashboard /></ProtectedRoute>} />
             <Route path="/management/requests" element={<ProtectedRoute role="management"><AdminRequests /></ProtectedRoute>} />
             <Route path="/management/generate" element={<ProtectedRoute role="management"><CertificateGeneration /></ProtectedRoute>} />
             <Route path="/management/users" element={<ProtectedRoute role="management"><AdminUsers /></ProtectedRoute>} />
 
-            {/* Admin (Principal) sees analytics, audit, signatures */}
             <Route path="/admin" element={<ProtectedRoute role="admin"><ManagementDashboard /></ProtectedRoute>} />
             <Route path="/admin/analytics" element={<ProtectedRoute role="admin"><ManagementAnalytics /></ProtectedRoute>} />
             <Route path="/admin/audit" element={<ProtectedRoute role="admin"><AuditLogs /></ProtectedRoute>} />

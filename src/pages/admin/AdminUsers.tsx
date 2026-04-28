@@ -1,25 +1,36 @@
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search, UserPlus, ShieldCheck } from "lucide-react";
-import { useState } from "react";
-
-const users = [
-  { id: "S101", name: "Aarav Sharma", role: "Student", dept: "CSE", status: "Active" },
-  { id: "S102", name: "Priya Verma", role: "Student", dept: "ECE", status: "Active" },
-  { id: "S103", name: "Rahul Iyer", role: "Student", dept: "MEC", status: "Active" },
-  { id: "S104", name: "Sneha Kapoor", role: "Student", dept: "CSE", status: "Active" },
-  { id: "S105", name: "Mohit Yadav", role: "Student", dept: "IT", status: "Suspended" },
-  { id: "A001", name: "Neha Pillai", role: "Admin", dept: "Registrar", status: "Active" },
-  { id: "M001", name: "Dr. Vikram Rao", role: "Management", dept: "Principal", status: "Active" },
-];
+import { getAllUsers } from "@/lib/supabaseService";
+import type { ProfileRow } from "@/lib/database.types";
 
 export default function AdminUsers() {
-  const [q, setQ] = useState("");
-  const filtered = users.filter((u) => `${u.name} ${u.id} ${u.dept}`.toLowerCase().includes(q.toLowerCase()));
+  const [users,   setUsers]   = useState<ProfileRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [q,       setQ]       = useState("");
+
+  useEffect(() => {
+    getAllUsers()
+      .then(setUsers)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const filtered = users.filter((u) =>
+    `${u.name} ${u.email} ${u.department ?? ""} ${u.roll_number ?? ""}`.toLowerCase().includes(q.toLowerCase())
+  );
+
+  const roleLabel: Record<string, string> = {
+    student:    "Student",
+    management: "Management",
+    admin:      "Admin",
+  };
+
   return (
     <AppShell role="management">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -44,14 +55,18 @@ export default function AdminUsers() {
             <TableHeader>
               <TableRow className="bg-muted/30 hover:bg-muted/30">
                 <TableHead>User</TableHead>
-                <TableHead>ID</TableHead>
+                <TableHead>Email</TableHead>
                 <TableHead>Role</TableHead>
-                <TableHead>Department</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Department / Designation</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered.map((u) => (
+              {loading && Array.from({ length: 4 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell colSpan={4}><Skeleton className="h-8 w-full" /></TableCell>
+                </TableRow>
+              ))}
+              {!loading && filtered.map((u) => (
                 <TableRow key={u.id} className="hover:bg-accent/40">
                   <TableCell>
                     <div className="flex items-center gap-3">
@@ -61,21 +76,25 @@ export default function AdminUsers() {
                       <div className="font-medium">{u.name}</div>
                     </div>
                   </TableCell>
-                  <TableCell className="font-mono text-xs">{u.id}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{u.email}</TableCell>
                   <TableCell>
                     <Badge variant="outline" className="border-primary/30 text-primary bg-primary/5">
-                      {u.role === "Admin" || u.role === "Management" ? <ShieldCheck className="h-3 w-3 mr-1" /> : null}
-                      {u.role}
+                      {u.role !== "student" && <ShieldCheck className="h-3 w-3 mr-1" />}
+                      {roleLabel[u.role] ?? u.role}
                     </Badge>
                   </TableCell>
-                  <TableCell>{u.dept}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={u.status === "Active" ? "bg-success/10 text-success border-success/30" : "bg-destructive/10 text-destructive border-destructive/30"}>
-                      {u.status}
-                    </Badge>
+                  <TableCell className="text-sm">
+                    {u.department
+                      ? <span>{u.department}{u.roll_number ? ` • ${u.roll_number}` : ""}</span>
+                      : <span className="text-muted-foreground">{u.designation ?? "—"}</span>}
                   </TableCell>
                 </TableRow>
               ))}
+              {!loading && filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={4} className="text-center py-10 text-muted-foreground">No users found</TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </Card>

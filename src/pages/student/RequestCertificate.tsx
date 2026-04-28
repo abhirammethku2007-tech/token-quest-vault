@@ -8,44 +8,50 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { useAuth } from "@/context/AuthContext";
-import { store, CertificateType, CertRequest } from "@/lib/mockStore";
+import { createRequest } from "@/lib/supabaseService";
+import type { CertificateType, CertRequestRow } from "@/lib/database.types";
 import { Loader2, FileSignature, CheckCircle2, Sparkles, Globe, Building, CalendarIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 type RequestMode = "online" | "offline";
 
 export default function RequestCertificate() {
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const [mode, setMode] = useState<RequestMode>("online");
-  const [type, setType] = useState<CertificateType>("Bonafide");
-  const [reason, setReason] = useState("");
-  const [visitDate, setVisitDate] = useState("");
-  const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState<CertRequest | null>(null);
+  const navigate  = useNavigate();
+
+  const [mode,           setMode]           = useState<RequestMode>("online");
+  const [type,           setType]           = useState<CertificateType>("Bonafide");
+  const [reason,         setReason]         = useState("");
+  const [visitDate,      setVisitDate]      = useState("");
+  const [submitting,     setSubmitting]     = useState(false);
+  const [success,        setSuccess]        = useState<CertRequestRow | null>(null);
   const [offlineSuccess, setOfflineSuccess] = useState(false);
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (mode === "offline" && !visitDate) return;
     setSubmitting(true);
-    setTimeout(() => {
+    try {
       if (mode === "online") {
-        const req = store.create({
-          studentId: user!.id,
+        const req = await createRequest({
+          studentId:   user!.id,
           studentName: user!.name,
-          rollNumber: user!.rollNumber!,
-          department: user!.department!,
+          rollNumber:  user!.rollNumber!,
+          department:  user!.department!,
           type,
-          reason,
+          reason: reason || undefined,
         });
         setSuccess(req);
       } else {
         setOfflineSuccess(true);
       }
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to submit request. Please try again.");
+    } finally {
       setSubmitting(false);
-    }, 800);
+    }
   };
 
   return (
@@ -58,34 +64,30 @@ export default function RequestCertificate() {
 
         {/* Mode toggle */}
         <div className="grid grid-cols-2 gap-4">
-          <button
-            type="button"
-            onClick={() => setMode("online")}
-            className={cn(
-              "rounded-xl p-4 border-2 text-left transition-all hover-lift",
-              mode === "online"
-                ? "border-primary bg-primary/5 dark:bg-primary/10 shadow-md"
-                : "border-border bg-card hover:border-primary/40"
-            )}
-          >
-            <Globe className={cn("h-6 w-6 mb-2", mode === "online" ? "text-primary" : "text-muted-foreground")} />
-            <p className="font-semibold text-sm">Online</p>
-            <p className="text-xs text-muted-foreground mt-0.5">PDF certificate generated & delivered digitally</p>
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode("offline")}
-            className={cn(
-              "rounded-xl p-4 border-2 text-left transition-all hover-lift",
-              mode === "offline"
-                ? "border-primary bg-primary/5 dark:bg-primary/10 shadow-md"
-                : "border-border bg-card hover:border-primary/40"
-            )}
-          >
-            <Building className={cn("h-6 w-6 mb-2", mode === "offline" ? "text-primary" : "text-muted-foreground")} />
-            <p className="font-semibold text-sm">Offline</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Collect certificate in-person at the college office</p>
-          </button>
+          {(["online", "offline"] as RequestMode[]).map((m) => (
+            <button
+              key={m}
+              type="button"
+              onClick={() => setMode(m)}
+              className={cn(
+                "rounded-xl p-4 border-2 text-left transition-all hover-lift",
+                mode === m
+                  ? "border-primary bg-primary/5 dark:bg-primary/10 shadow-md"
+                  : "border-border bg-card hover:border-primary/40"
+              )}
+            >
+              {m === "online"
+                ? <Globe className={cn("h-6 w-6 mb-2", mode === m ? "text-primary" : "text-muted-foreground")} />
+                : <Building className={cn("h-6 w-6 mb-2", mode === m ? "text-primary" : "text-muted-foreground")} />
+              }
+              <p className="font-semibold text-sm capitalize">{m}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {m === "online"
+                  ? "PDF certificate generated & delivered digitally"
+                  : "Collect certificate in-person at the college office"}
+              </p>
+            </button>
+          ))}
         </div>
 
         <Card className="glass-strong p-6 sm:p-8 border-white/50 dark:border-white/10">
@@ -121,8 +123,7 @@ export default function RequestCertificate() {
             {mode === "offline" && (
               <div className="space-y-2">
                 <Label className="flex items-center gap-1.5">
-                  <CalendarIcon className="h-3.5 w-3.5" />
-                  Preferred Visit Date
+                  <CalendarIcon className="h-3.5 w-3.5" /> Preferred Visit Date
                 </Label>
                 <Input
                   type="date"
@@ -152,15 +153,16 @@ export default function RequestCertificate() {
                 <Sparkles className="h-3.5 w-3.5 text-primary" />
                 {mode === "online"
                   ? <>A token like <span className="font-mono font-medium">BON-2026-CSE-0012</span> will be generated.</>
-                  : <>Your visit will be scheduled for the selected date.</>
-                }
+                  : <>Your visit will be scheduled for the selected date.</>}
               </p>
               <Button
                 type="submit"
                 disabled={submitting}
                 className="bg-gradient-to-r from-primary to-primary-glow text-primary-foreground btn-glow transition-all hover:scale-[1.02]"
               >
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <FileSignature className="h-4 w-4 mr-2" />}
+                {submitting
+                  ? <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  : <FileSignature className="h-4 w-4 mr-2" />}
                 {mode === "online" ? "Submit Request" : "Schedule Visit"}
               </Button>
             </div>
@@ -168,7 +170,7 @@ export default function RequestCertificate() {
         </Card>
       </div>
 
-      {/* Online success */}
+      {/* Online success dialog */}
       <Dialog open={!!success} onOpenChange={(o) => !o && setSuccess(null)}>
         <DialogContent className="glass-strong">
           <DialogHeader>
@@ -196,7 +198,7 @@ export default function RequestCertificate() {
         </DialogContent>
       </Dialog>
 
-      {/* Offline success */}
+      {/* Offline success dialog */}
       <Dialog open={offlineSuccess} onOpenChange={(o) => !o && setOfflineSuccess(false)}>
         <DialogContent className="glass-strong">
           <DialogHeader>
@@ -211,7 +213,9 @@ export default function RequestCertificate() {
           <div className="rounded-xl bg-gradient-to-br from-primary/10 to-primary-glow/10 p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">Visit Date</p>
             <p className="font-mono text-xl font-bold gradient-text">
-              {visitDate ? new Date(visitDate).toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" }) : ""}
+              {visitDate
+                ? new Date(visitDate).toLocaleDateString("en-IN", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
+                : ""}
             </p>
             <p className="text-xs text-muted-foreground mt-2">Certificate: {type}</p>
           </div>
