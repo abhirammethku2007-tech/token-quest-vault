@@ -11,7 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 import { RealQR } from "@/components/RealQR";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
-  ShieldCheck, FileSignature, Download, Sparkles,
+  ShieldCheck, FileSignature, Download,
   Loader2, Search, Eye, CheckCircle2, Clock,
 } from "lucide-react";
 import { toast } from "sonner";
