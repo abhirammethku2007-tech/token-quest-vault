@@ -5,6 +5,8 @@ import {
   ChevronRight, Zap, Globe, Star, Users, Award, TrendingUp,
 } from "lucide-react";
 import { CertificateMockup } from "@/components/CertificateMockup";
+import { ActivityTicker } from "@/components/ActivityTicker";
+import { RoleShowcase } from "@/components/RoleShowcase";
 
 // ─── Data ─────────────────────────────────────────────────────
 const features = [
@@ -160,6 +162,17 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ── Activity Ticker ────────────────────────────────── */}
+      <section className="py-6 border-y border-white/5 bg-white/[0.01]">
+        <div className="max-w-7xl mx-auto px-6 mb-3">
+          <div className="flex items-center gap-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-xs text-white/30 uppercase tracking-wider">Live Activity</span>
+          </div>
+        </div>
+        <ActivityTicker />
+      </section>
+
       {/* ── Features ───────────────────────────────────────── */}
       <section id="features" className="py-24 lg:py-32 relative">
         <div className="absolute inset-0 overflow-hidden">
@@ -231,6 +244,25 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ── Role Showcase ──────────────────────────────────── */}
+      <section className="py-24 lg:py-32 relative">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-indigo-950/10 to-transparent pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/20 rounded-full px-4 py-1.5 text-xs text-blue-400 mb-4">
+              <Users className="h-3.5 w-3.5" /> Three Roles, One Platform
+            </div>
+            <h2 className="text-4xl lg:text-5xl font-black text-white mb-4">
+              Built for everyone
+            </h2>
+            <p className="text-white/40 max-w-lg mx-auto">
+              Whether you're a student, staff, or principal — CertVault has a dedicated portal for you.
+            </p>
+          </div>
+          <RoleShowcase />
         </div>
       </section>
 
