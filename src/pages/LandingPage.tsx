@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import {
   ShieldCheck, GraduationCap, FileCheck2, QrCode,
   ArrowRight, Sparkles, Clock, Lock, CheckCircle2,
   ChevronRight, Zap, Globe, Star, Users, Award, TrendingUp,
 } from "lucide-react";
+import { CertificateMockup } from "@/components/CertificateMockup";
 
 // ─── Data ─────────────────────────────────────────────────────
 const features = [
@@ -76,71 +76,87 @@ export default function LandingPage() {
       </nav>
 
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex items-center justify-center pt-20">
+      <section className="relative min-h-screen flex items-center pt-20 pb-16">
         {/* Mesh gradient background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-violet-600/20 blur-[120px]" />
-          <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-indigo-600/20 blur-[120px]" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-64 rounded-full bg-purple-600/10 blur-[80px]" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-violet-600/15 blur-[140px]" />
+          <div className="absolute bottom-1/4 right-1/4 h-[400px] w-[400px] rounded-full bg-indigo-600/15 blur-[120px]" />
+          <div className="absolute top-1/2 right-1/3 h-64 w-64 rounded-full bg-purple-600/10 blur-[80px]" />
           {/* Grid pattern */}
-          <div className="absolute inset-0 opacity-[0.03]"
+          <div className="absolute inset-0 opacity-[0.025]"
             style={{ backgroundImage: "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+          {/* Radial fade at edges */}
+          <div className="absolute inset-0"
+            style={{ background: "radial-gradient(ellipse at center, transparent 40%, #0a0a0f 100%)" }} />
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-xs text-white/70 mb-8 backdrop-blur-sm">
-            <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-            MLRIT Digital Certificate Portal — Now Live
-          </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-6 w-full">
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-          {/* Heading */}
-          <h1 className="text-5xl sm:text-6xl lg:text-8xl font-black leading-[1.05] tracking-tight mb-6">
-            <span className="text-white">Your Certificates,</span>
-            <br />
-            <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
-              Secured & Verified
-            </span>
-          </h1>
-
-          <p className="text-lg sm:text-xl text-white/50 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Request, track, and download digitally signed college certificates with
-            QR-code verification and a transparent token-based queue system.
-          </p>
-
-          {/* CTA buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
-            <button onClick={() => navigate("/login?mode=signup")}
-              className="group flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white px-8 py-4 rounded-2xl font-semibold text-base transition-all hover:scale-105 shadow-2xl shadow-violet-500/30">
-              Create Free Account
-              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button onClick={() => navigate("/login")}
-              className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-2xl font-semibold text-base transition-all hover:scale-105 backdrop-blur-sm">
-              Sign In
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
-
-          {/* Floating stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-            {stats.map((s) => (
-              <div key={s.label}
-                className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm hover:bg-white/8 transition-colors">
-                <s.icon className="h-5 w-5 text-violet-400 mb-2 mx-auto" />
-                <p className="text-2xl font-black bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
-                  {s.value}
-                </p>
-                <p className="text-xs text-white/40 mt-0.5">{s.label}</p>
+            {/* Left — text content */}
+            <div>
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-4 py-1.5 text-xs text-white/70 mb-8 backdrop-blur-sm">
+                <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+                MLRIT Digital Certificate Portal — Now Live
               </div>
-            ))}
+
+              {/* Heading */}
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black leading-[1.05] tracking-tight mb-6">
+                <span className="text-white">Your Certificates,</span>
+                <br />
+                <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
+                  Secured &
+                </span>
+                <br />
+                <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
+                  Verified
+                </span>
+              </h1>
+
+              <p className="text-lg text-white/50 mb-10 leading-relaxed max-w-lg">
+                Request, track, and download digitally signed college certificates with
+                QR-code verification and a transparent token-based queue system.
+              </p>
+
+              {/* CTA buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+                <button onClick={() => navigate("/login?mode=signup")}
+                  className="group flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white px-8 py-4 rounded-2xl font-semibold text-base transition-all hover:scale-105 shadow-2xl shadow-violet-500/30">
+                  Create Free Account
+                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button onClick={() => navigate("/login")}
+                  className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-2xl font-semibold text-base transition-all hover:scale-105 backdrop-blur-sm">
+                  Sign In
+                  <ChevronRight className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Stats row */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                {stats.map((s) => (
+                  <div key={s.label} className="text-center">
+                    <p className="text-2xl font-black bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent">
+                      {s.value}
+                    </p>
+                    <p className="text-xs text-white/30 mt-0.5">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right — animated certificate mockup */}
+            <div className="hidden lg:flex items-center justify-center py-12">
+              <CertificateMockup />
+            </div>
           </div>
         </div>
 
         {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30 text-xs">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/20 text-xs">
           <span>Scroll to explore</span>
-          <div className="h-8 w-px bg-gradient-to-b from-white/30 to-transparent" />
+          <div className="h-8 w-px bg-gradient-to-b from-white/20 to-transparent" />
         </div>
       </section>
 
