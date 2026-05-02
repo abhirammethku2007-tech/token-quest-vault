@@ -82,26 +82,26 @@ export default function LandingPage() {
       </div>
 
       {/* ── Hero — compact, fits on screen ────────────────── */}
-      <section className="relative py-8 sm:py-10 lg:py-12">
+      <section className="relative py-10 sm:py-14 lg:py-16">
         {/* Background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 h-80 w-80 rounded-full bg-violet-600/12 blur-[100px]" />
-          <div className="absolute bottom-0 right-1/4 h-80 w-80 rounded-full bg-indigo-600/12 blur-[100px]" />
+          <div className="absolute top-0 left-1/4 h-96 w-96 rounded-full bg-violet-600/12 blur-[120px]" />
+          <div className="absolute bottom-0 right-1/4 h-96 w-96 rounded-full bg-indigo-600/12 blur-[120px]" />
           <div className="absolute inset-0 opacity-[0.02]"
             style={{ backgroundImage: "linear-gradient(white 1px, transparent 1px), linear-gradient(90deg, white 1px, transparent 1px)", backgroundSize: "50px 50px" }} />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
 
             {/* Left */}
             <div>
-              <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1 text-xs text-white/60 mb-5">
+              <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 rounded-full px-3 py-1.5 text-xs text-white/60 mb-6">
                 <span className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
                 MLRIT Digital Certificate Portal — Now Live
               </div>
 
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-[1.1] tracking-tight mb-4">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.08] tracking-tight mb-5">
                 <span className="text-white">Your Certificates,</span>
                 <br />
                 <span className="bg-gradient-to-r from-violet-400 via-purple-400 to-indigo-400 bg-clip-text text-transparent">
@@ -109,20 +109,20 @@ export default function LandingPage() {
                 </span>
               </h1>
 
-              <p className="text-sm sm:text-base text-white/50 mb-6 leading-relaxed max-w-lg">
+              <p className="text-base sm:text-lg text-white/50 mb-7 leading-relaxed max-w-lg">
                 Request, track, and download digitally signed college certificates with
                 QR-code verification and a transparent token-based queue system.
               </p>
 
               {/* CTA */}
-              <div className="flex flex-col sm:flex-row gap-3 mb-6">
+              <div className="flex flex-col sm:flex-row gap-3 mb-8">
                 <button onClick={() => navigate("/login?mode=signup")}
-                  className="group flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105 shadow-xl shadow-violet-500/25">
+                  className="group flex items-center justify-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:scale-105 shadow-xl shadow-violet-500/25">
                   Create Free Account
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button onClick={() => navigate("/login")}
-                  className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all hover:scale-105">
+                  className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-7 py-3.5 rounded-xl font-semibold text-sm transition-all hover:scale-105">
                   Sign In <ChevronRight className="h-4 w-4" />
                 </button>
               </div>
@@ -130,18 +130,18 @@ export default function LandingPage() {
               {/* Stats — compact 4-col */}
               <div className="grid grid-cols-4 gap-3">
                 {stats.map((s) => (
-                  <div key={s.label} className="text-center bg-white/[0.03] border border-white/[0.06] rounded-xl py-2.5 px-1">
-                    <p className="text-base sm:text-lg font-black bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent leading-tight">
+                  <div key={s.label} className="text-center bg-white/[0.03] border border-white/[0.06] rounded-xl py-3 px-1">
+                    <p className="text-lg sm:text-xl font-black bg-gradient-to-r from-violet-400 to-indigo-400 bg-clip-text text-transparent leading-tight">
                       {s.value}
                     </p>
-                    <p className="text-[9px] sm:text-[10px] text-white/30 mt-0.5">{s.label}</p>
+                    <p className="text-[10px] sm:text-xs text-white/30 mt-0.5">{s.label}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Right — certificate mockup (visible on ALL screens) */}
-            <div className="flex items-center justify-center mt-4 lg:mt-0">
+            {/* Right — certificate mockup */}
+            <div className="flex items-center justify-center mt-6 lg:mt-0">
               <CertificateMockup />
             </div>
           </div>
