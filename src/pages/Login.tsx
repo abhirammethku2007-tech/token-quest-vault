@@ -177,7 +177,7 @@ export default function Login() {
 
           {/* Back to home */}
           <button onClick={() => navigate("/")}
-            className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors mb-8">
+            className="flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 transition-colors font-medium mb-8">
             <ArrowLeft className="h-3.5 w-3.5" /> Back to home
           </button>
 
