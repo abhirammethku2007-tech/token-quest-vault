@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Eye, EyeOff, GraduationCap, ShieldCheck, Building2,
-  Loader2, Sparkles, UserPlus, LogIn, ArrowLeft,
+  Loader2, UserPlus, LogIn, ArrowLeft,
 } from "lucide-react";
 import { useAuth, Role } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -155,13 +155,15 @@ export default function Login() {
 
           <div className="space-y-3">
             {[
-              { icon: "🔐", text: "Cryptographically signed certificates" },
-              { icon: "📱", text: "Scannable QR code on every document" },
-              { icon: "⚡", text: "Real-time queue tracking & ETA" },
-              { icon: "🎓", text: "5 certificate types in one portal" },
+              { icon: "🔐", text: "Cryptographically signed certificates", bg: "bg-violet-500/20 border border-violet-500/30" },
+              { icon: "📱", text: "Scannable QR code on every document",   bg: "bg-blue-500/20 border border-blue-500/30" },
+              { icon: "⚡", text: "Real-time queue tracking & ETA",        bg: "bg-amber-500/20 border border-amber-500/30" },
+              { icon: "🎓", text: "5 certificate types in one portal",     bg: "bg-emerald-500/20 border border-emerald-500/30" },
             ].map((f) => (
-              <div key={f.text} className="flex items-center gap-3 text-sm text-white/50">
-                <span className="text-base">{f.icon}</span>
+              <div key={f.text} className="flex items-center gap-3 text-sm text-white/60">
+                <span className={`text-lg leading-none w-9 h-9 flex items-center justify-center rounded-xl ${f.bg} shrink-0`}>
+                  {f.icon}
+                </span>
                 {f.text}
               </div>
             ))}

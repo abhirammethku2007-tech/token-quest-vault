@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-// ─── Certificate data ─────────────────────────────────────────
 const certs = [
   {
     type: "BONAFIDE",
@@ -13,11 +12,12 @@ const certs = [
     from: "from-violet-600 to-indigo-600",
     text: "from-violet-400 to-indigo-400",
     bar: "from-violet-600 via-purple-500 to-indigo-600",
-    dot: "bg-violet-400",
+    dot: "bg-violet-500",
+    label: "Bonafide",
   },
   {
     type: "FEE RECEIPT",
-    token: "FEE-2026-CSE-0019",
+    token: "FEE-2026-ECE-0019",
     student: "Priya Verma",
     roll: "21ECE007",
     dept: "ECE",
@@ -26,7 +26,8 @@ const certs = [
     from: "from-blue-600 to-cyan-600",
     text: "from-blue-400 to-cyan-400",
     bar: "from-blue-600 via-cyan-500 to-blue-600",
-    dot: "bg-cyan-400",
+    dot: "bg-cyan-500",
+    label: "Fee Receipt",
   },
   {
     type: "STUDY CERTIFICATE",
@@ -39,15 +40,15 @@ const certs = [
     from: "from-emerald-600 to-teal-600",
     text: "from-emerald-400 to-teal-400",
     bar: "from-emerald-600 via-teal-500 to-emerald-600",
-    dot: "bg-emerald-400",
+    dot: "bg-emerald-500",
+    label: "Study Cert",
   },
 ];
 
-// ─── QR SVG (decorative) ──────────────────────────────────────
 function QRDecor() {
   return (
-    <div className="bg-white rounded-lg p-1.5">
-      <svg width="48" height="48" viewBox="0 0 52 52">
+    <div className="bg-white rounded-lg p-1.5 shrink-0">
+      <svg width="46" height="46" viewBox="0 0 52 52">
         <rect width="52" height="52" fill="white" />
         <rect x="2" y="2" width="16" height="16" rx="2" fill="#1e1b4b" />
         <rect x="4" y="4" width="12" height="12" rx="1" fill="white" />
@@ -80,39 +81,56 @@ function QRDecor() {
   );
 }
 
-// ─── Main component ───────────────────────────────────────────
 export function CertificateMockup() {
   const [current, setCurrent] = useState(0);
-  const [flipping, setFlipping] = useState(false);
+  const [sliding, setSliding] = useState(false);
+  const [direction, setDirection] = useState<"in" | "out">("in");
 
-  // Auto-flip every 3.5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
-      setFlipping(true);
+      // Slide out current
+      setDirection("out");
+      setSliding(true);
       setTimeout(() => {
         setCurrent((c) => (c + 1) % certs.length);
-        setFlipping(false);
-      }, 400); // half of flip duration
+        setDirection("in");
+        setSliding(false);
+      }, 350);
     }, 3500);
     return () => clearInterval(interval);
   }, []);
 
+  const goTo = (i: number) => {
+    if (i === current) return;
+    setDirection("out");
+    setSliding(true);
+    setTimeout(() => {
+      setCurrent(i);
+      setDirection("in");
+      setSliding(false);
+    }, 350);
+  };
+
   const cert = certs[current];
 
+  const slideStyle: React.CSSProperties = {
+    transition: "opacity 0.35s ease, transform 0.35s ease",
+    opacity: sliding ? 0 : 1,
+    transform: sliding
+      ? direction === "out" ? "translateX(-24px)" : "translateX(24px)"
+      : "translateX(0)",
+  };
+
   return (
-    <div
-      className="relative w-full max-w-sm mx-auto select-none -mt-8 lg:-mt-12"
-      style={{ perspective: "1200px" }}
-    >
+    <div className="relative w-full max-w-sm mx-auto select-none -mt-6 lg:-mt-10" style={{ perspective: "1200px" }}>
+
       {/* Glow */}
       <div className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${cert.from} opacity-20 blur-3xl scale-110 transition-all duration-700`} />
 
       {/* Dot indicators */}
-      <div className="flex justify-center gap-2 mb-4 relative z-10">
+      <div className="flex justify-center gap-2 mb-3 relative z-10">
         {certs.map((c, i) => (
-          <button
-            key={i}
-            onClick={() => { setFlipping(true); setTimeout(() => { setCurrent(i); setFlipping(false); }, 400); }}
+          <button key={i} onClick={() => goTo(i)}
             className={`h-1.5 rounded-full transition-all duration-300 ${
               i === current ? `w-6 ${c.dot}` : "w-1.5 bg-white/20"
             }`}
@@ -120,26 +138,21 @@ export function CertificateMockup() {
         ))}
       </div>
 
-      {/* Card with flip animation */}
+      {/* Card */}
       <div
         className="relative rounded-2xl overflow-hidden shadow-2xl"
-        style={{
-          animation: flipping
-            ? "certFlip 0.8s ease-in-out forwards"
-            : "certFloat 6s ease-in-out infinite",
-          transformStyle: "preserve-3d",
-        }}
+        style={{ animation: "certFloat 6s ease-in-out infinite" }}
       >
         {/* Top bar */}
         <div className={`h-2 bg-gradient-to-r ${cert.bar} transition-all duration-700`} />
 
-        {/* Body */}
-        <div className="bg-gradient-to-br from-[#13111f] to-[#0e0c1a] border border-white/10 p-5">
+        {/* Sliding content */}
+        <div className="bg-gradient-to-br from-[#13111f] to-[#0e0c1a] border border-white/10 p-5" style={slideStyle}>
 
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
             <div className={`h-9 w-9 rounded-xl bg-gradient-to-br ${cert.from} flex items-center justify-center shadow-lg shrink-0`}>
-              <svg className="h-4.5 w-4.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
             </div>
@@ -155,25 +168,23 @@ export function CertificateMockup() {
 
           <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-4" />
 
-          {/* Certificate type */}
+          {/* Type */}
           <div className="text-center mb-4">
             <p className="text-white/40 text-[9px] mb-1 uppercase tracking-widest">Certificate of</p>
-            <h3 className={`text-xl font-black bg-gradient-to-r ${cert.text} bg-clip-text text-transparent transition-all duration-500`}>
+            <h3 className={`text-xl font-black bg-gradient-to-r ${cert.text} bg-clip-text text-transparent`}>
               {cert.type}
             </h3>
           </div>
 
-          {/* Student info */}
-          <div className="text-center mb-4">
+          {/* Student */}
+          <div className="text-center mb-3">
             <p className="text-white/40 text-[9px] italic mb-1">This is to certify that</p>
             <p className="text-white font-bold text-base">{cert.student}</p>
             <div className={`h-0.5 w-28 bg-gradient-to-r ${cert.text} opacity-50 mx-auto mt-1 mb-1.5`} />
             <p className="text-white/50 text-[10px]">Roll No. {cert.roll} · Dept. of {cert.dept}</p>
           </div>
 
-          <p className="text-white/30 text-[10px] text-center leading-relaxed mb-4">
-            {cert.body}
-          </p>
+          <p className="text-white/30 text-[10px] text-center leading-relaxed mb-4">{cert.body}</p>
 
           {/* Footer */}
           <div className="flex items-end justify-between pt-3 border-t border-white/5">
@@ -185,9 +196,7 @@ export function CertificateMockup() {
               <p className="text-white/30 text-[8px] mt-1 uppercase tracking-wider">Issued</p>
               <p className="text-white/60 text-[10px]">01 May 2026</p>
             </div>
-
             <QRDecor />
-
             <div className="text-right">
               <p className={`bg-gradient-to-r ${cert.text} bg-clip-text text-transparent font-bold text-xs italic`} style={{ fontFamily: "cursive" }}>
                 Dr. R. Kumar
@@ -207,10 +216,8 @@ export function CertificateMockup() {
       </div>
 
       {/* Floating badges */}
-      <div
-        className="absolute -top-3 -right-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl px-2.5 py-1.5 shadow-xl border border-green-400/20"
-        style={{ animation: "certFloat 6s ease-in-out infinite", animationDelay: "1s" }}
-      >
+      <div className="absolute -top-3 -right-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl px-2.5 py-1.5 shadow-xl border border-green-400/20"
+        style={{ animation: "certFloat 6s ease-in-out infinite", animationDelay: "1s" }}>
         <div className="flex items-center gap-1">
           <svg className="h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -219,10 +226,8 @@ export function CertificateMockup() {
         </div>
       </div>
 
-      <div
-        className="absolute -bottom-3 -left-3 bg-[#13111f] border border-white/10 rounded-xl px-2.5 py-1.5 shadow-xl"
-        style={{ animation: "certFloat 6s ease-in-out infinite", animationDelay: "2s" }}
-      >
+      <div className="absolute -bottom-3 -left-3 bg-[#13111f] border border-white/10 rounded-xl px-2.5 py-1.5 shadow-xl"
+        style={{ animation: "certFloat 6s ease-in-out infinite", animationDelay: "2s" }}>
         <div className="flex items-center gap-1.5">
           <div className="h-6 w-6 rounded-lg bg-violet-600/20 flex items-center justify-center">
             <svg className="h-3 w-3 text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -236,27 +241,11 @@ export function CertificateMockup() {
         </div>
       </div>
 
-      <div
-        className="absolute top-6 -left-5 bg-[#13111f] border border-violet-500/20 rounded-lg px-2.5 py-1 shadow-lg"
-        style={{ animation: "certFloat 6s ease-in-out infinite", animationDelay: "3s" }}
-      >
-        <p className={`bg-gradient-to-r ${cert.text} bg-clip-text text-transparent font-mono text-[10px] font-bold`}>
-          {cert.token}
-        </p>
-        <p className="text-white/30 text-[8px]">Queue position #1</p>
-      </div>
-
-      {/* CSS animations */}
       <style>{`
         @keyframes certFloat {
           0%, 100% { transform: translateY(0px) rotate(0deg); }
           33% { transform: translateY(-10px) rotate(0.5deg); }
           66% { transform: translateY(-5px) rotate(-0.5deg); }
-        }
-        @keyframes certFlip {
-          0%   { transform: rotateY(0deg) translateY(-5px); }
-          50%  { transform: rotateY(90deg) translateY(-5px) scale(0.95); }
-          100% { transform: rotateY(0deg) translateY(-5px); }
         }
       `}</style>
     </div>

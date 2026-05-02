@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import {
   ShieldCheck, GraduationCap, FileCheck2, QrCode,
-  ArrowRight, Sparkles, Clock, Lock, CheckCircle2,
-  ChevronRight, Zap, Globe, Star, Users, Award, TrendingUp,
+  ArrowRight, Clock, Lock, CheckCircle2,
+  ChevronRight, Zap, Star, Users, Award, TrendingUp,
 } from "lucide-react";
 import { CertificateMockup } from "@/components/CertificateMockup";
 import { ActivityTicker } from "@/components/ActivityTicker";
@@ -77,8 +77,20 @@ export default function LandingPage() {
         </div>
       </nav>
 
+      {/* ── Live Activity Bar — visible immediately below navbar ── */}
+      <div className="pt-20">
+        <div className="border-b border-white/5 bg-white/[0.015] py-3">
+          <div className="max-w-7xl mx-auto px-6 flex items-center gap-3 mb-2">
+            <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-medium">Live Activity</span>
+            <span className="text-[10px] text-white/20">— Real-time certificate events across MLRIT</span>
+          </div>
+          <ActivityTicker />
+        </div>
+      </div>
+
       {/* ── Hero ───────────────────────────────────────────── */}
-      <section className="relative min-h-screen flex items-center pt-20 pb-16">
+      <section className="relative flex items-center pt-8 pb-16 min-h-[calc(100vh-80px)]">
         {/* Mesh gradient background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/4 h-[500px] w-[500px] rounded-full bg-violet-600/15 blur-[140px]" />
@@ -162,17 +174,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── Activity Ticker ────────────────────────────────── */}
-      <section className="py-6 border-y border-white/5 bg-white/[0.01]">
-        <div className="max-w-7xl mx-auto px-6 mb-3">
-          <div className="flex items-center gap-2">
-            <div className="h-1.5 w-1.5 rounded-full bg-green-400 animate-pulse" />
-            <span className="text-xs text-white/30 uppercase tracking-wider">Live Activity</span>
-          </div>
-        </div>
-        <ActivityTicker />
-      </section>
-
       {/* ── Features ───────────────────────────────────────── */}
       <section id="features" className="py-24 lg:py-32 relative">
         <div className="absolute inset-0 overflow-hidden">
@@ -181,7 +182,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-violet-500/10 border border-violet-500/20 rounded-full px-4 py-1.5 text-xs text-violet-400 mb-4">
-              <Sparkles className="h-3.5 w-3.5" /> Features
+              ✨ Features
             </div>
             <h2 className="text-4xl lg:text-5xl font-black text-white mb-4">
               Everything you need
