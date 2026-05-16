@@ -5,6 +5,7 @@ import type { CertRequestRow } from "@/lib/database.types";
 import { RealQR } from "@/components/RealQR";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Seo } from "@/components/Seo";
 import { ShieldCheck, XCircle, Loader2, ArrowLeft, CheckCircle2, Calendar, Hash, Building, User } from "lucide-react";
 
 export default function VerifyCertificate() {
