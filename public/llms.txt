@@ -1,0 +1,13 @@
+# CertVault
+
+> Secure college certificate portal. Students request bonafide, study, and fee certificates through a fair token-based queue; management approves and digitally signs them; anyone can verify a certificate's authenticity.
+
+## Pages
+
+- [Home](/): Overview of CertVault, the token queue, and verification.
+- [Sign in](/login): Sign in as a student, management, or admin user.
+- [Forgot password](/forgot-password): Request a password reset email.
+
+## Optional
+
+- [Verify a certificate](/verify/): Public verification page that confirms a certificate's digital signature given its token.
