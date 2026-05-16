@@ -85,7 +85,7 @@ export default function LandingPage() {
           </div>
           <ActivityTicker />
         </div>
-      </div>
+      <main>
 
       {/* ── Hero — compact, fits on screen ────────────────── */}
       <section className="relative py-10 sm:py-14 lg:py-16">
