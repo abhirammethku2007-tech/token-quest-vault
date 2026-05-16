@@ -43,6 +43,11 @@ export default function LandingPage() {
 
   return (
     <div className="bg-[#0a0a0f] text-white overflow-x-hidden">
+      <Seo
+        title="CertVault — Secure College Certificate Portal"
+        description="Request, track and verify college bonafide, study and fee certificates with a fair token-based queue and digital signature verification."
+        path="/"
+      />
 
       {/* ── Navbar ─────────────────────────────────────────── */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0a0a0f]/90 backdrop-blur-xl">
