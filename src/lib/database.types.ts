@@ -75,21 +75,25 @@ export interface Database {
         Row: ProfileRow;
         Insert: Omit<ProfileRow, "created_at">;
         Update: Partial<Omit<ProfileRow, "id">>;
+        Relationships: [];
       };
       cert_requests: {
         Row: CertRequestRow;
         Insert: Omit<CertRequestRow, "id" | "created_at" | "updated_at">;
         Update: Partial<Omit<CertRequestRow, "id" | "created_at">>;
+        Relationships: [];
       };
       audit_logs: {
         Row: AuditLogRow;
         Insert: Omit<AuditLogRow, "id">;
-        Update: never;
+        Update: Partial<AuditLogRow>;
+        Relationships: [];
       };
       signature_keys: {
         Row: SignatureKeyRow;
         Insert: Omit<SignatureKeyRow, "id" | "created_at">;
         Update: Partial<Omit<SignatureKeyRow, "id" | "created_at">>;
+        Relationships: [];
       };
     };
     Views: Record<string, never>;
