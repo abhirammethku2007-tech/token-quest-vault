@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { ShieldCheck, Loader2, ArrowLeft, Mail, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { Seo } from "@/components/Seo";
 import { toast } from "sonner";
 
 export default function ForgotPassword() {
