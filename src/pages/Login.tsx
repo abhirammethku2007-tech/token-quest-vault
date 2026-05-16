@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useAuth, Role } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { Seo } from "@/components/Seo";
 import { toast } from "sonner";
 
 const ADMIN_SECRET = "MLRIT@ADMIN2026";
