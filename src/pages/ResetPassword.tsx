@@ -45,6 +45,11 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
+      <Seo
+        title="Set a new CertVault password"
+        description="Choose a new password to finish resetting access to your CertVault account."
+        path="/reset-password"
+      />
       <div className="absolute top-1/4 -left-20 h-72 w-72 rounded-full bg-primary/30 blur-3xl animate-blob" />
       <div className="absolute bottom-1/4 -right-20 h-72 w-72 rounded-full bg-primary-glow/30 blur-3xl animate-blob" />
 
