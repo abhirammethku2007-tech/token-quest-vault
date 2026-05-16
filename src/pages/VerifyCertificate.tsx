@@ -32,6 +32,12 @@ export default function VerifyCertificate() {
 
   return (
     <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
+      <Seo
+        title={`Verify certificate ${token ?? ""} — CertVault`}
+        description="Verify the authenticity of a CertVault digital certificate using its unique token."
+        path={`/verify/${token ?? ""}`}
+        type="article"
+      />
       <div className="absolute top-1/4 -left-20 h-72 w-72 rounded-full bg-primary/20 blur-3xl animate-blob" />
       <div className="absolute bottom-1/4 -right-20 h-72 w-72 rounded-full bg-primary-glow/20 blur-3xl animate-blob" />
 
