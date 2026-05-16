@@ -7,6 +7,7 @@ import {
 import { CertificateMockup } from "@/components/CertificateMockup";
 import { ActivityTicker } from "@/components/ActivityTicker";
 import { RoleShowcase } from "@/components/RoleShowcase";
+import { Seo } from "@/components/Seo";
 
 const features = [
   { icon: ShieldCheck, title: "Digitally Signed",    desc: "Every certificate is cryptographically signed — tamper-proof and verifiable anywhere.",  color: "from-violet-500 to-indigo-500" },
