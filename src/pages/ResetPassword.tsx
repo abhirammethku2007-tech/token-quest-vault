@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { ShieldCheck, Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { Seo } from "@/components/Seo";
 import { toast } from "sonner";
 
 export default function ResetPassword() {
@@ -44,6 +45,11 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen gradient-bg flex items-center justify-center p-4">
+      <Seo
+        title="Set a new CertVault password"
+        description="Choose a new password to finish resetting access to your CertVault account."
+        path="/reset-password"
+      />
       <div className="absolute top-1/4 -left-20 h-72 w-72 rounded-full bg-primary/30 blur-3xl animate-blob" />
       <div className="absolute bottom-1/4 -right-20 h-72 w-72 rounded-full bg-primary-glow/30 blur-3xl animate-blob" />
 

@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useAuth, Role } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import { Seo } from "@/components/Seo";
 import { toast } from "sonner";
 
 const ADMIN_SECRET = "MLRIT@ADMIN2026";
@@ -123,6 +124,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] flex">
+      <Seo
+        title="Sign in to CertVault"
+        description="Sign in to your CertVault account to request, track or approve college certificates."
+        path="/login"
+      />
       {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-violet-600/10 blur-[120px]" />

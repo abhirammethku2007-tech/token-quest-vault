@@ -7,6 +7,7 @@ import {
 import { CertificateMockup } from "@/components/CertificateMockup";
 import { ActivityTicker } from "@/components/ActivityTicker";
 import { RoleShowcase } from "@/components/RoleShowcase";
+import { Seo } from "@/components/Seo";
 
 const features = [
   { icon: ShieldCheck, title: "Digitally Signed",    desc: "Every certificate is cryptographically signed — tamper-proof and verifiable anywhere.",  color: "from-violet-500 to-indigo-500" },
@@ -42,6 +43,11 @@ export default function LandingPage() {
 
   return (
     <div className="bg-[#0a0a0f] text-white overflow-x-hidden">
+      <Seo
+        title="CertVault — Secure College Certificate Portal"
+        description="Request, track and verify college bonafide, study and fee certificates with a fair token-based queue and digital signature verification."
+        path="/"
+      />
 
       {/* ── Navbar ─────────────────────────────────────────── */}
       <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-[#0a0a0f]/90 backdrop-blur-xl">
@@ -81,6 +87,7 @@ export default function LandingPage() {
         </div>
       </div>
 
+      <main>
       {/* ── Hero — compact, fits on screen ────────────────── */}
       <section className="relative py-10 sm:py-14 lg:py-16">
         {/* Background */}
@@ -279,6 +286,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      </main>
 
       {/* ── Footer ─────────────────────────────────────────── */}
       <footer className="border-t border-white/5 py-6">
